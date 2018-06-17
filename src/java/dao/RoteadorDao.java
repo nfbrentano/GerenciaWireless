@@ -132,4 +132,23 @@ public class RoteadorDao {
         return roteadores;
     }
 
+    public Roteador getUser(String codigoRoteador) {
+        // Instanciar objeto que será retornado
+        Roteador usuario = new Roteador();
+        try {
+            String sql = "SELECT usuario FROM pontoacesso WHERE idpontoacesso=?";
+
+            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
+            preparedStatement.setString(1, codigoRoteador);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            // Atribuir retorno do banco aos atributos do objeto roteador
+           
+                usuario.setUsuario(rs.getString("usuario"));
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuario;
+    }
 }
