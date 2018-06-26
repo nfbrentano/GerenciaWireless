@@ -8,10 +8,13 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import me.legrange.mikrotik.ApiConnection;
+import me.legrange.mikrotik.MikrotikApiException;
 import model.Roteador;
 import util.Db;
 
@@ -33,6 +36,16 @@ public class RoteadorDao {
         String sql = "select max(idpontoacesso+1) from pontoacesso";
         PreparedStatement preparedStatement = conexao.prepareStatement(sql);
         return 0;
+    }
+
+    public ResultSet ipRoteador(int idpontoacesso) throws SQLException {
+        String sql = "select iproteador from pontoacesso WHERE idpontoacesso =?";
+        PreparedStatement preparedStatement = conexao.prepareStatement(sql);
+        preparedStatement.setInt(1, idpontoacesso);
+        ResultSet rs = preparedStatement.executeQuery();
+        
+        
+        return (ResultSet) rs.getObject("iproteador");
     }
 
     public void insertRoteador(Roteador roteador) {
@@ -130,25 +143,5 @@ public class RoteadorDao {
             e.printStackTrace();
         }
         return roteadores;
-    }
-
-    public Roteador getUser(String codigoRoteador) {
-        // Instanciar objeto que será retornado
-        Roteador usuario = new Roteador();
-        try {
-            String sql = "SELECT usuario FROM pontoacesso WHERE idpontoacesso=?";
-
-            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-            preparedStatement.setString(1, codigoRoteador);
-            ResultSet rs = preparedStatement.executeQuery();
-
-            // Atribuir retorno do banco aos atributos do objeto roteador
-           
-                usuario.setUsuario(rs.getString("usuario"));
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return usuario;
     }
 }

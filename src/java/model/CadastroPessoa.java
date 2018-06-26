@@ -22,6 +22,7 @@ public class CadastroPessoa {
     private String endereco;
     private String numeroendereco;
     private String nomeusuario;
+    private String senhaacesso;
 
     public String getNomeusuario() {
         return nomeusuario;
@@ -38,7 +39,7 @@ public class CadastroPessoa {
     public void setSenhaacesso(String senhaacesso) {
         this.senhaacesso = senhaacesso;
     }
-    private String senhaacesso;
+    
 
     public int getIdcadastroPessoa() {
         return idcadastroPessoa;

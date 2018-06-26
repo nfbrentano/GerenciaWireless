@@ -13,7 +13,9 @@
     </head>
     <body>
         <nav class="navbar navbar-inverse">
+            
             <div class="container">
+                
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                         <span class="icon-bar"></span>
@@ -41,12 +43,12 @@
 
                         <li><a href="<%=request.getContextPath()%>/conexao/listarRoteador.jsp">Cadastro de Roteadores</a></li>                                
 
-                        <li><a href="<%=request.getContextPath()%>/conexao/painelRoteador.jsp">Painel de Roteadores</a></li>                                
+                    
 
                         <li><a href="${pageContext.request.contextPath}/logout.jsp">Logout</a></li>	      
 
-                    </ul>         	         
-                    </form>
+                    </ul>                                         
+                    
                 </div>
             </div>
         </nav>    

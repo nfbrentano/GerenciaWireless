@@ -4,6 +4,9 @@
     Author     : natan
 --%>
 
+<%@page import="org.snmp4j.Snmp"%>
+<%@page import="org.snmp4j.transport.DefaultUdpTransportMapping"%>
+<%@page import="org.snmp4j.TransportMapping"%>
 <%@page import="dao.RoteadorDao"%>
 <%@page import="model.Roteador"%>
 <%@page import="java.sql.ResultSet"%>
@@ -76,17 +79,29 @@
                                     <option value="${roteador.ssid}">${roteador.ssid}</option>
                                 </c:forEach>
 
+                                
+
                             </datalist>
                         </select>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="teste" class="col-sm-1 control-label">teste </label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text"  required="true" name="teste" maxlength="14" size="50" value='<%= rs.getString("largurabanda")%>'>
+                    </div>
+                </div>
 
+     
             </form>
         </div>
 
 
-        <%
-            } catch (Exception e) {
+        <%            }
+            catch (Exception e
+
+            
+                ) {
                 out.write("Ocorreu um erro ao buscar o registro: <span style='color: red'>" + e.getMessage() + "</span>");
             }
         %>

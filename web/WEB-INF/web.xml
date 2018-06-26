@@ -17,7 +17,7 @@
     <servlet-mapping>
         <servlet-name>ExcluirBairro</servlet-name>
         <url-pattern>/ExcluirBairro</url-pattern>
-    </servlet-mapping>    
+    </servlet-mapping>     
     <servlet>
         <servlet-name>ExcluirCidade</servlet-name>
         <servlet-class>ExcluirCidade</servlet-class>
@@ -58,6 +58,14 @@
         <servlet-name>ExcluirPessoa</servlet-name>
         <url-pattern>/ExcluirPessoa</url-pattern>
     </servlet-mapping>
+      <servlet>
+        <servlet-name>ExcluirRoteador</servlet-name>
+        <servlet-class>ExcluirRoteador</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ExcluirRoteador</servlet-name>
+        <url-pattern>/ExcluirRoteador</url-pattern>
+    </servlet-mapping>   
     <servlet-mapping>
         <servlet-name>BairroController</servlet-name>
         <url-pattern>/BairroController</url-pattern>
@@ -113,5 +121,6 @@
     <servlet>
         <servlet-name>RoteadorController</servlet-name>
         <servlet-class>controller.RoteadorController</servlet-class>
+        
     </servlet>
 </web-app>

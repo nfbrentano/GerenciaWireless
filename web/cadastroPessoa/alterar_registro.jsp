@@ -44,7 +44,7 @@
             Thread.sleep(2000);
             System.out.println(nomeusuario);
             con.close();
-       
+        }
         //ResultSet rs;
         int i = st.executeUpdate("UPDATE cadastropessoa SET nome = '" + nome + "', sobrenome = '" + sobrenome + "', documento = '" + documento + "', pais = '" + pais + "', estado = '" + estado + "', cidade = '" + cidade + "', bairro = '" + bairro + "', endereco = '" + endereco + "', numeroendereco = '" + numeroendereco + "', nomeusuario = '" + nomeusuario + "', senhaacesso = '" + senhaacesso + "', pontoacesso = '" + pontoacesso + "' WHERE idcadastroPessoa =  '" + idcadastroPessoa + "'");
 

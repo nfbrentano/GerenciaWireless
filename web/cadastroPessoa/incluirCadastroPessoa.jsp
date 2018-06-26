@@ -3,6 +3,7 @@
     Created on : Mar 25, 2018, 8:59:37 PM
     Author     : natan
 --%>
+<%@page import="dao.RoteadorDao"%>
 <!-- Import das classes necessárias -->
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.ResultSet"%>
@@ -47,6 +48,13 @@
     <body >
 
 
+
+        <%
+            // Instancia Objeto de Acesso aos Dados (DAO)
+            RoteadorDao roteador = new RoteadorDao();
+            // Buscar dados no banco
+            request.setAttribute("listaRoteadores", roteador.getAllRoteadores());
+        %>
         <%
             // Instancia Objeto de Acesso aos Dados (DAO)
             PaisDao pais = new PaisDao();
@@ -223,14 +231,12 @@
                 <div class="form-group">
                     <label for="pontoacesso" class="col-sm-1 control-label">Roteador: </label>
                     <div class="col-sm-9">
-                        <select class="form-control" name="pontoacesso" list="cidades">
-                            <datalist id="cidades">
-
+                        <select class="form-control" type="text" required="true" list="listaRoteadores" name="pontoacesso" >
+                            <datalist id="roteador">
                                 <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaCidades}" var="cidade">
-                                    <option value="${cidade.nome}">${cidade.nome}</option>
+                                <c:forEach items="${listaRoteadores}" var="roteador">
+                                    <option value="${roteador.ssid}">${roteador.ssid}</option>
                                 </c:forEach>
-
                             </datalist>
                         </select>
                     </div>
