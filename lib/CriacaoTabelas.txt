@@ -1,0 +1,110 @@
+-- -----------------------------------------------------
+-- Criação das tabelas das informações de endereços
+-- -----------------------------------------------------
+
+
+CREATE TABLE IF NOT EXISTS endereco (
+  idEndereco SERIAL,
+  rua VARCHAR(45) NULL,
+  bairro_idBairro INT NOT NULL,
+   disponibilidade boolean,
+  PRIMARY KEY (idEndereco)
+);
+
+CREATE TABLE IF NOT EXISTS bairro (
+  idBairro SERIAL,
+  nome VARCHAR(25) NULL,
+  cidade_idCidade INT NOT NULL,
+  disponibilidade boolean,
+  PRIMARY KEY (idBairro)
+);
+
+CREATE TABLE IF NOT EXISTS cidade (
+  idCidade SERIAL,
+  estado_idEstado INT NOT NULL,
+  nome VARCHAR(255) NULL,
+  disponibilidade boolean,
+  PRIMARY KEY (idCidade)
+);
+
+CREATE TABLE IF NOT EXISTS estado (
+  idEstado SERIAL,
+  pais_idPais INT NOT NULL,
+  sigla VARCHAR(5) NULL,
+  nome VARCHAR(25) NULL,
+  disponibilidade boolean,
+  PRIMARY KEY (idEstado)
+);
+
+CREATE TABLE IF NOT EXISTS pais (
+  idPais SERIAL,
+  nome VARCHAR(25) NULL,
+  disponibilidade boolean,
+  PRIMARY KEY (idPais)
+);
+-- -----------------------------------------------------
+-- Criação da tabela de cadastroPessoa
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS cadastropessoa (
+  idcadastroPessoa SERIAL,
+  nome VARCHAR(40) NULL,
+  sobrenome VARCHAR(40) NULL,
+  documento VARCHAR(14) NULL,
+  pais VARCHAR(50) NOT NULL,
+  estado VARCHAR(50) NOT NULL,
+  cidade VARCHAR(255) NOT NULL,
+  bairro VARCHAR(50) NOT NULL,
+  endereco VARCHAR(255) NOT NULL,
+  numeroEndereco INT,
+  disponibilidade boolean,
+  nomeusuario VARCHAR(45) NOT NULL,
+  senhaacesso VARCHAR(45) NOT NULL,
+  pontoacesso VARCHAR(45) NOT NULL,
+  PRIMARY KEY (idcadastroPessoa)
+);
+
+
+-- -----------------------------------------------------
+-- Criação da tabela de Ponto de acesso
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS pontoacesso (
+  idpontoacesso SERIAL,
+  ssid VARCHAR(45) NOT NULL,
+  modelo VARCHAR(45) NULL,
+  largurabanda VARCHAR(45) NULL,
+  frequencia VARCHAR(45) NOT NULL,
+  iproteador INT NOT NULL,
+  usuario VARCHAR(20) NOT NULL,
+  pass VARCHAR(25) NOT NULL,
+  disponibilidade boolean,
+  PRIMARY KEY (idpontoacesso)
+);
+
+CREATE TABLE IF NOT EXISTS frequencia (
+  idFrequencia SERIAL,
+  frequencia VARCHAR(4) NOT NULL
+);
+
+-- -----------------------------------------------------------
+-- Adição da chave extrangeria nas tabelas de endereço
+-- bairro, cidade, estado e pais
+-- -----------------------------------------------------------
+ALTER TABLE endereco ADD CONSTRAINT fk_endereco_bairro
+    FOREIGN KEY (bairro_idBairro)
+    REFERENCES bairro (idBairro);
+
+ALTER TABLE bairro ADD CONSTRAINT fk_bairro_cidade
+    FOREIGN KEY (cidade_idCidade)
+    REFERENCES cidade (idCidade);
+
+ALTER TABLE cidade ADD CONSTRAINT fk_cidade_estado
+    FOREIGN KEY (estado_idEstado)
+    REFERENCES estado (idEstado);
+
+ALTER TABLE estado ADD CONSTRAINT fk_estado_pais
+    FOREIGN KEY (pais_idPais)
+    REFERENCES pais (idPais);
+
+
