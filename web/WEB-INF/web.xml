@@ -58,7 +58,7 @@
         <servlet-name>ExcluirPessoa</servlet-name>
         <url-pattern>/ExcluirPessoa</url-pattern>
     </servlet-mapping>
-      <servlet>
+    <servlet>
         <servlet-name>ExcluirRoteador</servlet-name>
         <servlet-class>ExcluirRoteador</servlet-class>
     </servlet>
@@ -66,6 +66,15 @@
         <servlet-name>ExcluirRoteador</servlet-name>
         <url-pattern>/ExcluirRoteador</url-pattern>
     </servlet-mapping>   
+    
+     <servlet>
+        <servlet-name>ReiniciarRoteador</servlet-name>
+        <servlet-class>ReiniciarRoteador</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReiniciarRoteador</servlet-name>
+        <url-pattern>/ReiniciarRoteador</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>BairroController</servlet-name>
         <url-pattern>/BairroController</url-pattern>
@@ -114,13 +123,20 @@
         <servlet-name>CadastroPessoaController</servlet-name>
         <servlet-class>controller.CadastroPessoaController</servlet-class>
     </servlet>
-      <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>RoteadorController</servlet-name>
         <url-pattern>/RoteadorController</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>RoteadorController</servlet-name>
-        <servlet-class>controller.RoteadorController</servlet-class>
-        
+        <servlet-class>controller.RoteadorController</servlet-class>        
+    </servlet>
+     <servlet-mapping>
+        <servlet-name>FrequenciaController</servlet-name>
+        <url-pattern>/FrequenciaController</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FrequenciaController</servlet-name>
+        <servlet-class>controller.FrequenciaController</servlet-class>   
     </servlet>
 </web-app>

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import me.legrange.mikrotik.ApiConnection;
 import me.legrange.mikrotik.MikrotikApiException;
+import model.Frequencia;
 import model.Roteador;
 import util.Db;
 
@@ -43,8 +44,7 @@ public class RoteadorDao {
         PreparedStatement preparedStatement = conexao.prepareStatement(sql);
         preparedStatement.setInt(1, idpontoacesso);
         ResultSet rs = preparedStatement.executeQuery();
-        
-        
+
         return (ResultSet) rs.getObject("iproteador");
     }
 
@@ -144,4 +144,7 @@ public class RoteadorDao {
         }
         return roteadores;
     }
+
+   
+
 }

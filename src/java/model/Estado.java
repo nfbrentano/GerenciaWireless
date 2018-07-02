@@ -10,6 +10,7 @@ package model;
  * @author natan
  */
 public class Estado {
+
     private int idestado;
     private String pais_idpais;
     private String sigla;
@@ -31,8 +32,6 @@ public class Estado {
     public void setPais_idpais(String pais_idpais) {
         this.pais_idpais = pais_idpais;
     }
-
-    
 
     public String getSigla() {
         return sigla;
@@ -57,6 +56,5 @@ public class Estado {
     public void setDisponibilidade(boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
     }
-    
-    
+
 }

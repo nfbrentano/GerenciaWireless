@@ -138,7 +138,6 @@ public class CadastroPessoaDao {
                 pessoa.setNumeroendereco(rs.getString("numeroendereco"));
                 pessoa.setNomeusuario(rs.getString("nomeusuario"));
                 pessoa.setSenhaacesso(rs.getString("senhaacesso"));
-                
 
                 // Adicionar à lista
                 cadastroPessoa.add(pessoa);

@@ -27,12 +27,12 @@ public class Db {
 
         // Caso já exista uma conexão, retorna a existente
         if (conexaoDB != null) {
-            
+
             return conexaoDB;
-            
+
         } else { // Se não existir conexão, cria uma nova conexão
             try {
-                
+
                 // É interessante armazenar as informações de conexão num arquivo externo pois, dessa forma,
                 // não será necessário recompilar o projeto caso mude o nome da base, usuário ou senha....
                 Properties prop = new Properties();

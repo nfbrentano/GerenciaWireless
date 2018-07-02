@@ -10,7 +10,8 @@ package model;
  * @author natan
  */
 public class Cidade {
-     private int idcidade;
+
+    private int idcidade;
     private String nome;
     private String estado_idestado;
     private boolean disponibilidade;
@@ -39,9 +40,6 @@ public class Cidade {
         this.estado_idestado = estado_idestado;
     }
 
-
-    
-
     public boolean isDisponibilidade() {
         return disponibilidade;
     }
@@ -49,5 +47,5 @@ public class Cidade {
     public void setDisponibilidade(boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
     }
-    
+
 }

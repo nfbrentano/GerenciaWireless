@@ -8,7 +8,7 @@
 <%@page import="java.sql.DriverManager"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="java.sql.ResultSet"%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -28,20 +28,23 @@
         <!-- Outros -->
         <link rel="stylesheet" href="<%=request.getContextPath()%>/CSS/bootstrap.css">
         <script type="text/javascript">
-<!-- Fun√ß√£o javascript para chamar edi√ß√£o de registro -->
-            function editarRegistro(idcadastroPessoa) {
-                window.location.href = "<%=request.getContextPath()%>/conexao/editarCadastroRoteador.jsp?cod=" + idcadastroPessoa;
+<!-- FunÁ„o javascript para chamar ediÁ„o de registro -->
+            function editarRegistro(idcadastroRoteador) {
+                window.location.href = "<%=request.getContextPath()%>/conexao/editarCadastroRoteador.jsp?cod=" + idcadastroRoteador;
             }
 
-<!-- Fun√ß√£o javascript para chamar Servlet de exclus√£o de registro -->
+<!-- FunÁ„o javascript para chamar Servlet de exclus„o de registro -->
             function excluirRegistro(idpontoacesso, ssid) {
-                if (confirm('Confirma exclus√£o do Roteador de c√≥digo: ' + idpontoacesso + ' - SSID: ' + ssid + '?')) {
+                if (confirm('Confirma exclus„o do Roteador de cÛdigo: ' + idpontoacesso + ' - SSID: ' + ssid + '?')) {
                     window.location.href = "<%=request.getContextPath()%>/ExcluirRoteador?cod=" + idpontoacesso;
                 } else {
-                    alert('Exclus√£o cancelada.');
+                    alert('Exclus„o cancelada.');
                 }
             }
-        </script>
+
+
+            </script>
+           
         <title>Cadastro de Roteadores</title>
 
     </head>
@@ -71,14 +74,15 @@
 
             <thead>
                 <tr>
-                    <th >C√≥digo</th>
+                    <th >CÛdigo</th>
                     <th >SSID</th>
                     <th >Modelo</th>
                     <th >Largura de Banda Mhz</th>
-                    <th >Frequ√™ncia</th>
+                    <th >FrequÍncia</th>
                     <th >IP Roteador</th>
-                    <th >Usu√°rio</th>
+                    <th >Usu·rio</th>
                     <th >Senha</th>
+                    <th >Reboot</th>
                     <th >Editar</th>
                     <th >Deletar</th>
 
@@ -88,7 +92,7 @@
             <tbody>
 
                 <!-- Buscar registros no banco de dados
-                     Cada linha da tabela apresentar√° um registro da tabela "clientes" -->
+                     Cada linha da tabela apresentar· um registro da tabela "clientes" -->
                 <%
                     try {
 
@@ -108,8 +112,8 @@
                                 out.write("<p>Pesquisando por: ");
                                 out.write(localizarValor + "</p>");
 
-                                // Adicionar condi√ß√£o WHERE ao SQL
-                                // Observe que o SQL busca o valor parcial (%) e em min√∫sculo (LOWER)
+                                // Adicionar condiÁ„o WHERE ao SQL
+                                // Observe que o SQL busca o valor parcial (%) e em min˙sculo (LOWER)
                                 // Vamos pesquisar em todos os campos...
                                 query += " AND LOWER(nome) LIKE '%" + localizarValor + "%'";
 
@@ -133,6 +137,7 @@
                     <td> <%= rs.getString("iproteador")%> </td>
                     <td> <%= rs.getString("usuario")%> </td>
                     <td> <%= rs.getString("pass")%> </td>
+                    <td class="text-center"> <a class='btn btn-info btn-xs' onclick="reiniciarRoteador(<%= rs.getInt("idpontoacesso")%>);"><span class="glyphicon glyphicon-edit"></span>  Reboot</a> </td> 
                     <td class="text-center"> <a class='btn btn-info btn-xs' onclick="editarRegistro(<%= rs.getInt("idpontoacesso")%>);"><span class="glyphicon glyphicon-edit"></span>  Editar</a> </td> 
                     <td class="text-center"> <a class='btn btn-danger btn-xs' onclick="excluirRegistro(<%= rs.getInt("idpontoacesso")%>, '<%= rs.getString("ssid")%>');"><span class="glyphicon glyphicon-remove"></span> Del</a></td>
 
@@ -143,7 +148,7 @@
                             rs.close();
 
                         } catch (Exception e) {
-                            out.write("Ocorreu um erro ao buscar os cadastros de usu√°rios <span style='color: red'>" + e.getMessage() + "</span>");
+                            out.write("Ocorreu um erro ao buscar os cadastros de usu·rios <span style='color: red'>" + e.getMessage() + "</span>");
                         } finally {
                         }
 

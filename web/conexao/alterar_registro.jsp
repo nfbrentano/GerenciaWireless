@@ -41,18 +41,18 @@
             ApiConnection con = ApiConnection.connect("" + ip + ""); // connect
             con.login("" + user + "", "" + password + ""); // log in to router
             con.execute("/interface/wireless/set ssid ='" + ssid + "'  numbers=0");
-             Thread.sleep(2000); 
+             Thread.sleep(200); 
             System.out.println(frequencia);
             con.execute("/interface/wireless/set frequency='" + frequencia + "' numbers=0");
             System.out.println(user);
             System.out.println(usuario);
-            Thread.sleep(2000); 
+            Thread.sleep(200); 
             con.execute("/user/set name='" + usuario + "' numbers=" + user + "");
             System.out.println(ip);
             System.out.println(iproteador);
             String novoip = iproteador+"/24";
             System.out.println(novoip);
-            Thread.sleep(2000); 
+            Thread.sleep(200); 
          //   con.execute("ip/address/add address='"+novoip+"' interface=bridge1");
             System.out.println("depois conectar mikrotik");
         }

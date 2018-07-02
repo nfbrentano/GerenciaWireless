@@ -4,6 +4,7 @@
     Author     : natan
 --%>
 
+<%@page import="dao.RoteadorDao"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.Statement"%>
 <%@page import="java.sql.DriverManager"%>
@@ -33,6 +34,7 @@
         <title>Alterar Cadastro de Roteador</title>
     </head>
     <body onload="document.formTeste.nome.focus()">
+     
         <%
             try {
 

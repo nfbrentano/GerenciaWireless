@@ -35,12 +35,12 @@ public class CidadeDao {
      *
      * @param cidade
      */
-    public int IdCidade () throws SQLException{
+    public int IdCidade() throws SQLException {
         String sql = "select max(idcidade+1) from cidade";
         PreparedStatement preparedStatement = conexao.prepareStatement(sql);
         return 0;
     }
-    
+
     public void insertCidade(Cidade cidade) {
         try {
             String sql = "INSERT INTO cidade( nome, estado_idestado, disponibilidade) VALUES ( ?, ?, true )";
@@ -79,7 +79,8 @@ public class CidadeDao {
 
     /**
      * Método para atualizar os dados de uma cidade
-     * @param cidade 
+     *
+     * @param cidade
      */
     public void updateCidade(Cidade cidade) {
         try {
@@ -101,7 +102,8 @@ public class CidadeDao {
 
     /**
      * Método para retornar todas as cidades cadastradas
-     * @return 
+     *
+     * @return
      */
     public List<Cidade> getAllCidades() {
         List<Cidade> cidades = new ArrayList<Cidade>();
@@ -129,8 +131,9 @@ public class CidadeDao {
 
     /**
      * Retornar os dados de uma cidade
+     *
      * @param codigoCidade
-     * @return 
+     * @return
      */
     public Cidade getCidadeByCodigo(int codigoCidade) {
 
@@ -139,17 +142,17 @@ public class CidadeDao {
 
         try {
             String sql = "SELECT * FROM cidade WHERE idcidade=?";
-            
+
             PreparedStatement preparedStatement = conexao.prepareStatement(sql);
             preparedStatement.setInt(1, codigoCidade);
-            
+
             ResultSet rs = preparedStatement.executeQuery();
 
             // Atribuir retorno do banco aos atributos do objeto cidade
             if (rs.next()) {
                 cidade.setIdcidade(rs.getInt("idcidade"));
                 cidade.setNome(rs.getString("nome"));
-                cidade.setEstado_idestado(rs.getString("estado_idestado"));                
+                cidade.setEstado_idestado(rs.getString("estado_idestado"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -35,12 +35,12 @@ public class PaisDao {
      *
      * @param pais
      */
-    public int IdPais () throws SQLException{
+    public int IdPais() throws SQLException {
         String sql = "select max(idpais+1) from pais";
         PreparedStatement preparedStatement = conexao.prepareStatement(sql);
         return 0;
     }
-    
+
     public void insertPais(Pais pais) {
         try {
             String sql = "INSERT INTO pais( nome, disponibilidade) VALUES ( ?, true )";
@@ -49,7 +49,7 @@ public class PaisDao {
 
             // Parâmetros iniciam com 1
             preparedStatement.setString(1, pais.getNome());
-            
+
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -79,7 +79,8 @@ public class PaisDao {
 
     /**
      * Método para atualizar os dados de uma pais
-     * @param pais 
+     *
+     * @param pais
      */
     public void updatePais(Pais pais) {
         try {
@@ -88,7 +89,7 @@ public class PaisDao {
             PreparedStatement preparedStatement = conexao.prepareStatement(sql);
 
             // Parâmetros iniciam com 1
-            preparedStatement.setString(1, pais.getNome()); 
+            preparedStatement.setString(1, pais.getNome());
             preparedStatement.setInt(2, pais.getIdpais());
 
             preparedStatement.executeUpdate();
@@ -100,7 +101,8 @@ public class PaisDao {
 
     /**
      * Método para retornar todas as paises cadastradas
-     * @return 
+     *
+     * @return
      */
     public List<Pais> getAllPaises() {
         List<Pais> paises = new ArrayList<Pais>();
@@ -113,7 +115,6 @@ public class PaisDao {
                 Pais pais1 = new Pais();
                 pais1.setIdpais(rs.getInt("idpais"));
                 pais1.setNome(rs.getString("nome"));
-                
 
                 // Adicionar à lista
                 paises.add(pais1);
@@ -128,8 +129,9 @@ public class PaisDao {
 
     /**
      * Retornar os dados de uma pais
+     *
      * @param codigoPais
-     * @return 
+     * @return
      */
     public Pais getPaisByCodigo(int codigoPais) {
 
@@ -138,16 +140,16 @@ public class PaisDao {
 
         try {
             String sql = "SELECT * FROM pais WHERE idpais=?";
-            
+
             PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-            preparedStatement.setInt(1, codigoPais); 
+            preparedStatement.setInt(1, codigoPais);
             ResultSet rs = preparedStatement.executeQuery();
 
             // Atribuir retorno do banco aos atributos do objeto pais
             if (rs.next()) {
                 paises.setIdpais(rs.getInt("idpais"));
                 paises.setNome(rs.getString("nome"));
-                           
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

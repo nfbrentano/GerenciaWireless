@@ -39,7 +39,6 @@ public class CadastroPessoa {
     public void setSenhaacesso(String senhaacesso) {
         this.senhaacesso = senhaacesso;
     }
-    
 
     public int getIdcadastroPessoa() {
         return idcadastroPessoa;
@@ -120,8 +119,5 @@ public class CadastroPessoa {
     public void setNumeroendereco(String numeroendereco) {
         this.numeroendereco = numeroendereco;
     }
-    
 
-   
-    
 }

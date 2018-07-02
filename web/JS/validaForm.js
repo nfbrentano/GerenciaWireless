@@ -53,42 +53,42 @@ function validaFormBairro()
 
     return true;
 }
- function validaFormEstado()
+function validaFormEstado()
+{
+
+    for (i = 0; i < 3; i++)
+    {
+        campo = document.formTeste.elements[i];
+
+        if (!campo.value)
         {
-
-            for (i = 0; i < 3; i++)
-            {
-                campo = document.formTeste.elements[i];
-
-                if (!campo.value)
-                {
-                    alert('Você não informou o campo ' + campo.name + '!');
-                    campo.focus()
-                    return false;
-                }
-            }
-
-            return true;
+            alert('Você não informou o campo ' + campo.name + '!');
+            campo.focus()
+            return false;
         }
-        
-        function validaFormEndereco()
+    }
+
+    return true;
+}
+
+function validaFormEndereco()
+{
+
+    for (i = 0; i < 3; i++)
+    {
+        campo = document.formTeste.elements[i];
+
+        if (!campo.value)
         {
-
-            for (i = 0; i < 3; i++)
-            {
-                campo = document.formTeste.elements[i];
-
-                if (!campo.value)
-                {
-                    alert('Você não informou o campo ' + campo.name + '!');
-                    campo.focus()
-                    return false;
-                }
-            }
-
-            return true;
+            alert('Você não informou o campo ' + campo.name + '!');
+            campo.focus()
+            return false;
         }
-        function validaFormRoteador()
+    }
+
+    return true;
+}
+function validaFormRoteador()
 {
 
     for (i = 0; i < 3; i++)

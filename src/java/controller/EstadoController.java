@@ -30,7 +30,7 @@ public class EstadoController extends HttpServlet {
 
     public EstadoController() {
         super();
-        
+
         // Instanciar um objeto do tipo EstadoDao, que já possuirá a conexão ao banco
         dao = new EstadoDao();
     }
@@ -79,28 +79,28 @@ public class EstadoController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Instanciar objeto estado
         Estado estado = new Estado();
-        
+
         // Atribuir parâmetros recebidos
         estado.setNome(request.getParameter("nome"));
         estado.setPais_idpais(request.getParameter("pais_idpais"));
         String codigoEstado = request.getParameter("idestado");
-        
+
         // Verificar se tem código.
         // Se não tiver, deve-se inserir uma nova estado
         if (codigoEstado == null || codigoEstado.isEmpty()) {
-            
+
             dao.insertEstado(estado);
-            
+
         } else { // Se tiver código, significa que deve atualizar
-            
+
             estado.setIdestado(Integer.parseInt(codigoEstado));
             dao.updateEstado(estado);
-            
+
         }
-        
+
         // Dispatcher para onde será redirecionado
         RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
         // Adicionar atributo

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author natan
@@ -43,13 +42,13 @@ public class ExcluirCidade extends HttpServlet {
             Statement st = conn.createStatement();
 
             // SQL para excluir
-            String query = "UPDATE cidade SET disponibilidade = false WHERE idcidade = "+idcidade;
-            
+            String query = "UPDATE cidade SET disponibilidade = false WHERE idcidade = " + idcidade;
+
             // Executa o SQL de exclusão
             st.execute(query);
-            
+
             // Encaminha para a listagem 
-            request.getRequestDispatcher( "/endereco/listarCidades.jsp" ).forward(request, response);
+            request.getRequestDispatcher("/endereco/listarCidades.jsp").forward(request, response);
 
         } catch (Exception e) {
             response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o cidade: '" + e.getMessage() + ")</script>");

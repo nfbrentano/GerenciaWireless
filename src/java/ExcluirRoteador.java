@@ -13,12 +13,12 @@ import javax.servlet.http.HttpServletResponse;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author natan
  */
-public class ExcluirRoteador extends HttpServlet { 
+public class ExcluirRoteador extends HttpServlet {
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -58,5 +58,5 @@ public class ExcluirRoteador extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Servlet para excluir roteadores";
-    }  
+    }
 }

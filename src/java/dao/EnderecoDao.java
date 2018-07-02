@@ -35,12 +35,12 @@ public class EnderecoDao {
      *
      * @param endereco
      */
-    public int IdEndereco () throws SQLException{
+    public int IdEndereco() throws SQLException {
         String sql = "select max(idendereco+1) from endereco";
         PreparedStatement preparedStatement = conexao.prepareStatement(sql);
         return 0;
     }
-    
+
     public void insertEndereco(Endereco endereco) {
         try {
             String sql = "INSERT INTO endereco( rua, bairro_idbairro, disponibilidade) VALUES ( ?, ?, true )";
@@ -79,7 +79,8 @@ public class EnderecoDao {
 
     /**
      * Método para atualizar os dados de uma endereco
-     * @param endereco 
+     *
+     * @param endereco
      */
     public void updateEndereco(Endereco endereco) {
         try {
@@ -101,7 +102,8 @@ public class EnderecoDao {
 
     /**
      * Método para retornar todas as enderecos cadastradas
-     * @return 
+     *
+     * @return
      */
     public List<Endereco> getAllEnderecos() {
         List<Endereco> enderecos = new ArrayList<Endereco>();
@@ -129,8 +131,9 @@ public class EnderecoDao {
 
     /**
      * Retornar os dados de uma endereco
+     *
      * @param codigoEndereco
-     * @return 
+     * @return
      */
     public Endereco getEnderecoByCodigo(int codigoEndereco) {
 
@@ -139,17 +142,17 @@ public class EnderecoDao {
 
         try {
             String sql = "SELECT * FROM endereco WHERE idendereco=?";
-            
+
             PreparedStatement preparedStatement = conexao.prepareStatement(sql);
             preparedStatement.setInt(1, codigoEndereco);
-            
+
             ResultSet rs = preparedStatement.executeQuery();
 
             // Atribuir retorno do banco aos atributos do objeto endereco
             if (rs.next()) {
                 endereco.setIdendereco(rs.getInt("idendereco"));
                 endereco.setRua(rs.getString("rua"));
-                endereco.setBairro_idbairro(rs.getString("bairro_idbairro"));                
+                endereco.setBairro_idbairro(rs.getString("bairro_idbairro"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

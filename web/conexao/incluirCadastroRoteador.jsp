@@ -87,28 +87,28 @@
                     <div class="col-sm-9">
                         <input class="form-control" type="text" onkeyup="somenteNumeros(this);"  name="frequencia" maxlength="14" size="50">
                     </div>
-                    </div>
-                     <div class="form-group">
+                </div>
+                <div class="form-group">
                     <label  for="iproteador" class="col-sm-1 control-label">IP:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" required="true" name="iproteador" maxlength="15" size="50" >
                     </div>
                 </div>
-                    
-                     <div class="form-group">
+
+                <div class="form-group">
                     <label  for="usuario" class="col-sm-1 control-label">Usuário:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" required="true" name="usuario" maxlength="20" size="50" >
                     </div>
                 </div>
-                    
-                     <div class="form-group">
+
+                <div class="form-group">
                     <label  for="pass" class="col-sm-1 control-label">Senha:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" required="true" name="pass" maxlength="25" size="50" >
                     </div>
                 </div>
-                    
+
                 <div class="form-group">
                     <div class="col-sm-9 col-sm-offset-1">
                         <button type="submit" class="btn btn-primary btn-block" name="enviar"  onclick="validaFormRoteador()">Registrar</button>
@@ -116,7 +116,7 @@
                         <a class="btn btn-primary btn-block" name="voltar" type="submit" href="<%=request.getContextPath()%>/conexao/listarRoteador.jsp" > Voltar </a>
                     </div>
                 </div>
-                    
+
             </form>
         </div>
         <%

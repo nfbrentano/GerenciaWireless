@@ -10,6 +10,7 @@ package model;
  * @author natan
  */
 public class Endereco {
+
     private int idendereco;
     private String rua;
     private String bairro_idbairro;
@@ -47,6 +48,4 @@ public class Endereco {
         this.disponibilidade = disponibilidade;
     }
 
-  
-    
 }

@@ -20,7 +20,7 @@ import util.Db;
  * @author natan
  */
 public class EstadoDao {
-    
+
     // Atributo para armazenar a conexao com o banco de dados
     private Connection conexao;
 
@@ -73,7 +73,8 @@ public class EstadoDao {
 
     /**
      * Método para atualizar os dados de uma estado
-     * @param estado 
+     *
+     * @param estado
      */
     public void updateEstado(Estado estado) {
         try {
@@ -95,14 +96,15 @@ public class EstadoDao {
 
     /**
      * Método para retornar todas as estados cadastradas
-     * @return 
+     *
+     * @return
      */
     public List<Estado> getAllEstados() {
         List<Estado> estados = new ArrayList<Estado>();
 
         try {
             Statement statement = conexao.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM estado WHERE disponibilidade = true ORDER BY idestado DESC" );
+            ResultSet rs = statement.executeQuery("SELECT * FROM estado WHERE disponibilidade = true ORDER BY idestado DESC");
 
             while (rs.next()) {
                 Estado estado = new Estado();
@@ -123,8 +125,9 @@ public class EstadoDao {
 
     /**
      * Retornar os dados de uma estado
+     *
      * @param codigoEstado
-     * @return 
+     * @return
      */
     public Estado getEstadoByCodigo(int codigoEstado) {
 
@@ -133,17 +136,17 @@ public class EstadoDao {
 
         try {
             String sql = "SELECT * FROM estado WHERE idestado=?";
-            
+
             PreparedStatement preparedStatement = conexao.prepareStatement(sql);
             preparedStatement.setInt(1, codigoEstado);
-            
+
             ResultSet rs = preparedStatement.executeQuery();
 
             // Atribuir retorno do banco aos atributos do objeto estado
             if (rs.next()) {
                 estado.setIdestado(rs.getInt("idestado"));
                 estado.setNome(rs.getString("nome"));
-                estado.setPais_idpais(rs.getString("pais_idpais"));                
+                estado.setPais_idpais(rs.getString("pais_idpais"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -154,4 +157,3 @@ public class EstadoDao {
     }
 
 }
-

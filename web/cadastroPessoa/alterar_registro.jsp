@@ -20,40 +20,49 @@
     String nomeusuario = request.getParameter("nomeusuario");
     String senhaacesso = request.getParameter("senhaacesso");
     String pontoacesso = request.getParameter("pontoacesso");
-
+    // Registrar o driver JDBC para PostgreSQL
+    Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
+    // Conectar o banco
+    Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
+    // Statement para executar a query
+    Statement st = conn.createStatement();
     try {
-        // Registrar o driver JDBC para PostgreSQL
-        Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-        // Conectar o banco
-        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-        // Statement para executar a query
-        Statement st = conn.createStatement();
 
+        System.out.println("Testando acesso");
+        System.out.println(pontoacesso);
         ResultSet rs = st.executeQuery("SELECT * FROM pontoacesso WHERE ssid = '" + pontoacesso + "'");
+
+        System.out.println(st);
         while (rs.next()) {
             System.out.println("depois while");
             String ip = rs.getString("iproteador");
             String user = rs.getString("usuario");
             String password = rs.getString("pass");
-            System.out.println(ip);
-            System.out.println(user);
-            System.out.println("Antes conectar mikrotik...");
-            ApiConnection con = ApiConnection.connect("" + ip + ""); // connect
-            con.login("" + user + "", "" + password + ""); // log in to router
-            con.execute("/ip/hotspot/user/add name ='" + nomeusuario + "'  password='" + senhaacesso + "'");
-            Thread.sleep(2000);
-            System.out.println(nomeusuario);
-            con.close();
-        }
-        //ResultSet rs;
-        int i = st.executeUpdate("UPDATE cadastropessoa SET nome = '" + nome + "', sobrenome = '" + sobrenome + "', documento = '" + documento + "', pais = '" + pais + "', estado = '" + estado + "', cidade = '" + cidade + "', bairro = '" + bairro + "', endereco = '" + endereco + "', numeroendereco = '" + numeroendereco + "', nomeusuario = '" + nomeusuario + "', senhaacesso = '" + senhaacesso + "', pontoacesso = '" + pontoacesso + "' WHERE idcadastroPessoa =  '" + idcadastroPessoa + "'");
+            ResultSet res = st.executeQuery("SELECT * FROM cadastropessoa WHERE idcadastropessoa = '" + idcadastroPessoa + "'");
+            while (res.next()) {
+                String nomeusuarioold = res.getString("nomeusuario");
+                System.out.println(ip);
+                System.out.println(nomeusuarioold);
+                System.out.println("Usiarui" + user);
+                System.out.println("senharoteador" + password);
+                System.out.println("Antes conectar mikrotik...");
+                ApiConnection con = ApiConnection.connect("" + ip + ""); // connect
+                con.login("" + user + "", "" + password + ""); // log in to router
+                con.execute("/ip/hotspot/user/set numbers='" + nomeusuarioold + "' name ='" + nomeusuario + "'  password='" + senhaacesso + "'");
 
-        // Verificar se o update foi bem sucedido
-        if (i > 0) {
-            response.sendRedirect("sucesso_registro.jsp");
+                System.out.println(nomeusuario);
+                con.close();
+                //ResultSet rs;
+                int i = st.executeUpdate("UPDATE cadastropessoa SET nome = '" + nome + "', sobrenome = '" + sobrenome + "', documento = '" + documento + "', pais = '" + pais + "', estado = '" + estado + "', cidade = '" + cidade + "', bairro = '" + bairro + "', endereco = '" + endereco + "', numeroendereco = '" + numeroendereco + "', nomeusuario = '" + nomeusuario + "', senhaacesso = '" + senhaacesso + "', pontoacesso = '" + pontoacesso + "' WHERE idcadastroPessoa =  '" + idcadastroPessoa + "'");
 
-        } else {
-            response.sendRedirect("listarCadastroPessoa.jsp");
+                // Verificar se o update foi bem sucedido
+                if (i > 0) {
+                    response.sendRedirect("sucesso_registro.jsp");
+
+                } else {
+                    response.sendRedirect("listarCadastroPessoa.jsp");
+                }
+            }
         }
 
     } catch (Exception e) {

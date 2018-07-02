@@ -93,12 +93,12 @@
                             <input class="form-control" type="text"  id="rua" name="rua" maxlengt=255 size="50"  required >
                         </div>
                     </div>
-                            
+
                     <div class="form-group">
                         <label for="codbairro" class="col-sm-1 control-label">Cód do Bairro</label>
                         <div class="col-sm-9">
                             <input class="form-control" type="text" required="true" list="bairros" name="bairro_idbairro" maxlenght="50" size="50" required >
-                          
+
                             <datalist id="bairros">
 
                                 <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
@@ -109,22 +109,22 @@
                             </datalist> 
                         </div>
                     </div>
-                          
-                             <div class="form-group">
+
+                    <div class="form-group">
                         <div class="col-sm-9 col-sm-offset-1">
                             <button type="submit" class="btn btn-primary btn-block" name="enviar"  onclick="validaFormEndereco()">Registrar</button>
                             <button type="reset" class="btn btn-primary btn-block" name="limpar" >Limpar</button>
                             <a class="btn btn-primary btn-block" name="voltar" type="submit" href="<%=request.getContextPath()%>/endereco/listarPaises.jsp" > Voltar </a>
                         </div>
                     </div>
-          
 
-<%
-    } catch (Exception e) {
-        out.write("Ocorreu um erro ao buscar o registro: <span style='color: red'>" + e.getMessage() + "</span>");
-    }
-%>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</body>
-</html>
+
+                    <%
+                        } catch (Exception e) {
+                            out.write("Ocorreu um erro ao buscar o registro: <span style='color: red'>" + e.getMessage() + "</span>");
+                        }
+                    %>
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+                    </body>
+                    </html>

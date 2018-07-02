@@ -30,7 +30,7 @@ public class CidadeController extends HttpServlet {
 
     public CidadeController() {
         super();
-        
+
         // Instanciar um objeto do tipo CidadeDao, que já possuirá a conexão ao banco
         dao = new CidadeDao();
     }
@@ -79,28 +79,28 @@ public class CidadeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Instanciar objeto cidade
         Cidade cidade = new Cidade();
-        
+
         // Atribuir parâmetros recebidos
         cidade.setNome(request.getParameter("nome"));
         cidade.setEstado_idestado(request.getParameter("estado_idestado"));
-          String codigoCidade = request.getParameter("idcidade");
-        
+        String codigoCidade = request.getParameter("idcidade");
+
         // Verificar se tem código.
         // Se não tiver, deve-se inserir uma nova cidade
         if (codigoCidade == null || codigoCidade.isEmpty()) {
-            
+
             dao.insertCidade(cidade);
-            
+
         } else { // Se tiver código, significa que deve atualizar
-            
-            cidade.setIdcidade(Integer.parseInt(codigoCidade) );
+
+            cidade.setIdcidade(Integer.parseInt(codigoCidade));
             dao.updateCidade(cidade);
-            
+
         }
-        
+
         // Dispatcher para onde será redirecionado
         RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
         // Adicionar atributo

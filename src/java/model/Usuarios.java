@@ -10,6 +10,7 @@ package model;
  * @author natan
  */
 public class Usuarios {
+
     private int idusuarios;
     private String nome;
     private String senha;
@@ -46,5 +47,5 @@ public class Usuarios {
     public void setSupervisor(String supervisor) {
         this.supervisor = supervisor;
     }
-    
+
 }

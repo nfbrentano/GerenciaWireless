@@ -1,0 +1,16 @@
+-- -----------------------------------------------------
+
+CANAIS WIFI
+
+-- -----------------------------------------------------
+insert into frequencia VALUES (1,2412);
+insert into frequencia VALUES (2,2417);
+insert into frequencia VALUES (3,2422);
+insert into frequencia VALUES (4,2427);
+insert into frequencia VALUES (5,2432);
+insert into frequencia VALUES (6,2437);
+insert into frequencia VALUES (7,2442);
+insert into frequencia VALUES (8,2447);
+insert into frequencia VALUES (9,2452);
+insert into frequencia VALUES (10,2472);
+insert into frequencia VALUES (11,2462);

@@ -10,6 +10,7 @@ package model;
  * @author natan
  */
 public class Bairro {
+
     private int idbairro;
     private String nome;
     private String cidade_idcidade;
@@ -46,5 +47,5 @@ public class Bairro {
     public void setDisponibilidade(boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
     }
-    
+
 }
