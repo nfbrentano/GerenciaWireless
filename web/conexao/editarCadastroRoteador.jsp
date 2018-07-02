@@ -8,7 +8,7 @@
 <%@page import="java.sql.Statement"%>
 <%@page import="java.sql.DriverManager"%>
 <%@page import="java.sql.Connection"%>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -28,6 +28,7 @@
         <!-- Outros -->
         <script language="JavaScript" src="<%=request.getContextPath()%>/JS/somenteNumeros.js"></script>
         <script language="JavaScript" src="<%=request.getContextPath()%>/JS/validaForm.js"></script>
+
         <link rel="stylesheet" href="<%=request.getContextPath()%>/CSS/bootstrap.css">
         <title>Alterar Cadastro de Roteador</title>
     </head>
@@ -58,7 +59,7 @@
                 <h2 class="card-title mt-3 text-center">Alterar Cadastro de Roteador</h2>
 
                 <div class="form-group">
-                    <label for="cod" class="col-sm-1 control-label">CÃ³digo:</label>
+                    <label for="cod" class="col-sm-1 control-label">Código:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" required="true" name="idpontoacesso" readonly="true" value='<%= rs.getInt("idpontoacesso")%>'>
                     </div>   
@@ -83,7 +84,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="frequencia" class="col-sm-1 control-label">FrequÃªncia:</label>
+                    <label for="frequencia" class="col-sm-1 control-label">Frequência:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" onkeyup="somenteNumeros(this);" required="true" name="frequencia" maxlength="14" size="50" value='<%= rs.getString("frequencia")%>'>
                     </div>
@@ -97,7 +98,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label  for="usuario" class="col-sm-1 control-label">UsuÃ¡rio:</label>
+                    <label  for="usuario" class="col-sm-1 control-label">Usuário:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" required="true" name="usuario" maxlength="20" size="50" value='<%= rs.getString("usuario")%>'>
                     </div>
@@ -127,7 +128,7 @@
             }
         %>
 
-                    
+
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
