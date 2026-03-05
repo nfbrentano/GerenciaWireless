@@ -1,19 +1,43 @@
+import { useState, useEffect } from 'react';
 import { Wifi, Users, MapPin, Activity, Settings2, ShieldCheck, Download } from 'lucide-react';
+import { fetchApi } from '../api/config';
 
 export default function Dashboard() {
+    const [roteadores, setRoteadores] = useState([]);
+    const [clientes, setClientes] = useState([]);
+    const [enderecos, setEnderecos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const loadDashboardData = async () => {
+            try {
+                setLoading(true);
+                const [rotData, cliData, endData] = await Promise.all([
+                    fetchApi('/RoteadorController'),
+                    fetchApi('/CadastroPessoaController'),
+                    fetchApi('/EnderecoController')
+                ]);
+                setRoteadores(rotData);
+                setClientes(cliData);
+                setEnderecos(endData);
+            } catch (err) {
+                setError(err.message || 'Falha ao carregar dados do dashboard.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadDashboardData();
+    }, []);
+
     const stats = [
-        { label: 'Total de Roteadores', value: '1,248', icon: <Wifi size={24} />, trend: '+12%', color: 'var(--accent-primary)' },
-        { label: 'Clientes Ativos', value: '8,432', icon: <Users size={24} />, trend: '+4%', color: 'var(--success)' },
-        { label: 'Endereços Mapeados', value: '439', icon: <MapPin size={24} />, trend: '+2%', color: 'var(--warning)' },
+        { label: 'Total de Roteadores', value: roteadores.length, icon: <Wifi size={24} />, trend: 'Atualizado', color: 'var(--accent-primary)' },
+        { label: 'Clientes Ativos', value: clientes.length, icon: <Users size={24} />, trend: 'Atualizado', color: 'var(--success)' },
+        { label: 'Endereços Mapeados', value: enderecos.length, icon: <MapPin size={24} />, trend: 'Atualizado', color: 'var(--warning)' },
         { label: 'Uptime Médio', value: '99.9%', icon: <Activity size={24} />, trend: 'Estável', color: 'var(--danger)' },
     ];
 
-    const recentRouters = [
-        { id: 'RT-8842', mac: '00:1A:2B:3C:4D:5E', status: 'Online', ip: '192.168.1.10', location: 'Centro' },
-        { id: 'RT-1193', mac: '00:1A:2B:3C:4D:5F', status: 'Offline', ip: '192.168.1.12', location: 'Zona Sul' },
-        { id: 'RT-2834', mac: '00:1A:2B:3C:4D:6A', status: 'Manutenção', ip: '192.168.1.55', location: 'Zona Norte' },
-        { id: 'RT-9944', mac: '00:1A:2B:3C:4D:7B', status: 'Online', ip: '192.168.1.88', location: 'Leste' },
-    ];
+    const recentRouters = roteadores.slice(0, 5); // Mostrar os últimos 5 como exemplo
 
     return (
         <>
@@ -27,6 +51,12 @@ export default function Dashboard() {
                 </button>
             </div>
 
+            {error && (
+                <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px', marginBottom: '16px' }}>
+                    <strong>Erro:</strong> {error}. Certifique-se de que o backend Java (NetBeans) está rodando.
+                </div>
+            )}
+
             <div className="grid-cards">
                 {stats.map((stat, i) => (
                     <div key={i} className="card stat-card">
@@ -35,7 +65,7 @@ export default function Dashboard() {
                         </div>
                         <div className="stat-info">
                             <h3>{stat.label}</h3>
-                            <p>{stat.value}</p>
+                            <p>{loading ? '...' : stat.value}</p>
                             <span style={{ fontSize: '0.75rem', color: stat.trend.includes('+') ? 'var(--success)' : 'var(--text-muted)' }}>
                                 {stat.trend} este mês
                             </span>
@@ -47,7 +77,7 @@ export default function Dashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                 <div className="card" style={{ gridColumn: '1 / -1' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                        <h2>Status dos Roteadores</h2>
+                        <h2>Status dos Roteadores Registrados</h2>
                         <button className="btn-icon">
                             <Settings2 size={20} />
                         </button>
@@ -58,34 +88,44 @@ export default function Dashboard() {
                             <thead>
                                 <tr>
                                     <th>Codígo</th>
-                                    <th>Endereço MAC</th>
+                                    <th>SSID</th>
                                     <th>Status</th>
                                     <th>IP Local</th>
-                                    <th>Localização</th>
+                                    <th>Frequência</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {recentRouters.map((router, i) => (
-                                    <tr key={i}>
-                                        <td style={{ fontWeight: '500' }}>{router.id}</td>
-                                        <td style={{ color: 'var(--text-muted)' }}>{router.mac}</td>
+                                {loading && recentRouters.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                                            Carregando dados...
+                                        </td>
+                                    </tr>
+                                ) : recentRouters.length > 0 ? recentRouters.map((router, i) => (
+                                    <tr key={router.idpontoacesso || i}>
+                                        <td style={{ fontWeight: '500' }}>{router.idpontoacesso}</td>
+                                        <td style={{ color: 'var(--text-muted)' }}>{router.ssid}</td>
                                         <td>
-                                            <span className={`badge ${router.status === 'Online' ? 'success' :
-                                                    router.status === 'Offline' ? 'danger' : 'warning'
-                                                }`}>
-                                                {router.status}
+                                            <span className="badge success">
+                                                On/Off
                                             </span>
                                         </td>
-                                        <td>{router.ip}</td>
-                                        <td>{router.location}</td>
+                                        <td>{router.iproteador}</td>
+                                        <td>{router.frequencia}</td>
                                         <td>
                                             <button className="btn-icon" title="Verificar status SNMP">
                                                 <ShieldCheck size={18} />
                                             </button>
                                         </td>
                                     </tr>
-                                ))}
+                                )) : (
+                                    <tr>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                                            Nenhum roteador encontrado.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

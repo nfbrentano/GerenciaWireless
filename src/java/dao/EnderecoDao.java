@@ -18,7 +18,7 @@ public class EnderecoDao {
     public void insertEndereco(Endereco endereco) {
         String sql = "INSERT INTO endereco(rua, bairro_idbairro, disponibilidade) VALUES (?, ?, true)";
         try (Connection conexao = Db.getConexao();
-             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+                PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
             preparedStatement.setString(1, endereco.getRua());
             preparedStatement.setString(2, endereco.getBairro_idbairro());
@@ -32,7 +32,7 @@ public class EnderecoDao {
     public void deleteEndereco(int codigoEndereco) {
         String sql = "UPDATE endereco SET disponibilidade=false WHERE idendereco=?";
         try (Connection conexao = Db.getConexao();
-             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+                PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, codigoEndereco);
             preparedStatement.executeUpdate();
@@ -45,7 +45,7 @@ public class EnderecoDao {
     public void updateEndereco(Endereco endereco) {
         String sql = "UPDATE endereco SET rua=?, bairro_idbairro=? WHERE idendereco=?";
         try (Connection conexao = Db.getConexao();
-             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+                PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
             preparedStatement.setString(1, endereco.getRua());
             preparedStatement.setString(2, endereco.getBairro_idbairro());
@@ -59,16 +59,25 @@ public class EnderecoDao {
 
     public List<Endereco> getAllEnderecos() {
         List<Endereco> enderecos = new ArrayList<>();
-        String sql = "SELECT * FROM endereco WHERE disponibilidade = true ORDER BY idendereco DESC";
+        String sql = "SELECT e.idendereco, e.rua, e.bairro_idbairro, "
+                + "b.nome AS bairro_nome, c.nome AS cidade_nome, es.nome AS estado_nome "
+                + "FROM endereco e "
+                + "LEFT JOIN bairro b ON b.idbairro = CAST(NULLIF(e.bairro_idbairro, '') AS INTEGER) "
+                + "LEFT JOIN cidade c ON c.idcidade = CAST(NULLIF(b.cidade_idcidade, '') AS INTEGER) "
+                + "LEFT JOIN estado es ON es.idestado = CAST(NULLIF(c.estado_idestado, '') AS INTEGER) "
+                + "WHERE e.disponibilidade = true ORDER BY e.idendereco DESC";
         try (Connection conexao = Db.getConexao();
-             Statement statement = conexao.createStatement();
-             ResultSet rs = statement.executeQuery(sql)) {
+                Statement statement = conexao.createStatement();
+                ResultSet rs = statement.executeQuery(sql)) {
 
             while (rs.next()) {
                 Endereco endereco = new Endereco();
                 endereco.setIdendereco(rs.getInt("idendereco"));
                 endereco.setRua(rs.getString("rua"));
                 endereco.setBairro_idbairro(rs.getString("bairro_idbairro"));
+                endereco.setBairro(rs.getString("bairro_nome"));
+                endereco.setCidade(rs.getString("cidade_nome"));
+                endereco.setEstado(rs.getString("estado_nome"));
                 enderecos.add(endereco);
             }
         } catch (SQLException e) {
@@ -79,9 +88,15 @@ public class EnderecoDao {
 
     public Endereco getEnderecoByCodigo(int codigoEndereco) {
         Endereco endereco = null;
-        String sql = "SELECT * FROM endereco WHERE idendereco=?";
+        String sql = "SELECT e.idendereco, e.rua, e.bairro_idbairro, "
+                + "b.nome AS bairro_nome, c.nome AS cidade_nome, es.nome AS estado_nome "
+                + "FROM endereco e "
+                + "LEFT JOIN bairro b ON b.idbairro = CAST(NULLIF(e.bairro_idbairro, '') AS INTEGER) "
+                + "LEFT JOIN cidade c ON c.idcidade = CAST(NULLIF(b.cidade_idcidade, '') AS INTEGER) "
+                + "LEFT JOIN estado es ON es.idestado = CAST(NULLIF(c.estado_idestado, '') AS INTEGER) "
+                + "WHERE e.idendereco=?";
         try (Connection conexao = Db.getConexao();
-             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+                PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, codigoEndereco);
             try (ResultSet rs = preparedStatement.executeQuery()) {
@@ -90,6 +105,9 @@ public class EnderecoDao {
                     endereco.setIdendereco(rs.getInt("idendereco"));
                     endereco.setRua(rs.getString("rua"));
                     endereco.setBairro_idbairro(rs.getString("bairro_idbairro"));
+                    endereco.setBairro(rs.getString("bairro_nome"));
+                    endereco.setCidade(rs.getString("cidade_nome"));
+                    endereco.setEstado(rs.getString("estado_nome"));
                 }
             }
         } catch (SQLException e) {

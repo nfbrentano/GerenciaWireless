@@ -37,7 +37,7 @@ export default function Enderecos() {
     };
 
     const filtered = enderecos.filter(e =>
-        e.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.rua?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         e.bairro?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         e.cidade?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -100,10 +100,11 @@ export default function Enderecos() {
                                 {filtered.length > 0 ? filtered.map((endereco) => (
                                     <tr key={endereco.idendereco}>
                                         <td style={{ fontWeight: '500' }}>{endereco.idendereco}</td>
-                                        <td style={{ color: 'var(--text-primary)' }}>{endereco.nome}</td>
+                                        <td style={{ color: 'var(--text-primary)' }}>{endereco.rua}</td>
                                         <td style={{ color: 'var(--accent-primary)' }}>{endereco.bairro}</td>
                                         <td>{endereco.cidade}</td>
                                         <td><span className="badge success">{endereco.estado}</span></td>
+
                                         <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                                             <button className="btn-icon" title="Editar">
                                                 <Edit size={18} />
