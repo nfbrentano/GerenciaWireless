@@ -11,7 +11,7 @@ public class BairroService {
         this.dao = new BairroDao();
     }
 
-    public List<Bairro> listarTodos() {
+    public List<Bairro> listar() {
         return dao.getAllBairros();
     }
 
@@ -27,7 +27,7 @@ public class BairroService {
         dao.deleteBairro(id);
     }
 
-    public Bairro buscarPorId(int id) {
+    public Bairro getById(int id) {
         return dao.getBairroByCodigo(id);
     }
 }

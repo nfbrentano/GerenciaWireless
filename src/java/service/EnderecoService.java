@@ -11,9 +11,9 @@ public class EnderecoService {
         this.dao = new EnderecoDao();
     }
 
-    public List<Endereco> listarTodos() {
+    public List<Endereco> listar() {
         return dao.getAllEnderecos();
-    }
+     }
 
     public void salvar(Endereco endereco) {
         if (endereco.getIdendereco() == 0) {
@@ -27,7 +27,7 @@ public class EnderecoService {
         dao.deleteEndereco(id);
     }
 
-    public Endereco buscarPorId(int id) {
+    public Endereco getById(int id) {
         return dao.getEnderecoByCodigo(id);
     }
 }

@@ -11,7 +11,7 @@ public class PaisService {
         this.dao = new PaisDao();
     }
 
-    public List<Pais> listarTodos() {
+    public List<Pais> listar() {
         return dao.getAllPaises();
     }
 
@@ -27,7 +27,7 @@ public class PaisService {
         dao.deletePais(id);
     }
 
-    public Pais buscarPorId(int id) {
+    public Pais getById(int id) {
         return dao.getPaisByCodigo(id);
     }
 }

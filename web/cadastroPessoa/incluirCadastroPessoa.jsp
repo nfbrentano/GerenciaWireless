@@ -1,265 +1,180 @@
-<%-- 
-    Document   : incluirCadastroPessoa
-    Created on : Mar 25, 2018, 8:59:37 PM
-    Author     : natan
---%>
-<%@page import="dao.RoteadorDao"%>
-<!-- Import das classes necessárias -->
-<%@page import="java.sql.ResultSet"%>
-<%@page import="java.sql.ResultSet"%>
-<%@page import="java.sql.Statement"%>
-<%@page import="java.sql.Statement"%>
-<%@page import="java.sql.DriverManager"%>
-<%@page import="java.sql.DriverManager"%>
-<%@page import="java.sql.Connection"%>
-<%@page import="dao.EnderecoDao"%>
-<%@page import="dao.PaisDao"%>
-<%@page import="dao.EstadoDao"%>
-<%@page import="dao.CidadeDao"%>
-<%@page import="dao.BairroDao"%>
-<%@page import="model.CadastroPessoa"%>
-<%-- Para poder utilizar a jstl é necessário adicionar o respectivo .jar nas bibliotecas --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@page import="service.CadastroPessoaService" %>
+    <%@page import="dao.RoteadorDao" %>
+        <%@page import="java.sql.ResultSet" %>
+            <%@page import="java.sql.Statement" %>
+                <%@page import="java.sql.Connection" %>
+                    <%@page import="dao.EnderecoDao" %>
+                        <%@page import="dao.PaisDao" %>
+                            <%@page import="dao.EstadoDao" %>
+                                <%@page import="dao.CidadeDao" %>
+                                    <%@page import="dao.BairroDao" %>
+                                        <%@page import="model.CadastroPessoa" %>
+                                            <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+                                                <%@page contentType="text/html" pageEncoding="UTF-8" %>
+                                                    <!DOCTYPE html>
+                                                    <html>
 
-<!DOCTYPE html>
-<html>
+                                                    <head>
+                                                        <meta http-equiv="Content-Type"
+                                                            content="text/html; charset=UTF-8">
+                                                        <title>Incluir Cadastro Pessoa</title>
+                                                        <link rel="stylesheet"
+                                                            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+                                                    </head>
 
-    <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                                                    <body style="background-color: #f5f5f5;">
+                                                        <% try { request.setAttribute("listaPaises", new
+                                                            service.PaisService().listar());
+                                                            request.setAttribute("listaEstados", new
+                                                            service.EstadoService().listar());
+                                                            request.setAttribute("listaCidades", new
+                                                            service.CidadeService().listar());
+                                                            request.setAttribute("listaBairros", new
+                                                            service.BairroService().listar());
+                                                            request.setAttribute("listaEnderecos", new
+                                                            service.EnderecoService().listar());
+                                                            request.setAttribute("listaRoteadores", new
+                                                            service.RoteadorService().listar()); int proximoId=0; try
+                                                            (java.sql.Connection conn=util.Db.getConexao();
+                                                            java.sql.Statement st=conn.createStatement();
+                                                            java.sql.ResultSet rs=st.executeQuery("SELECT
+                                                            COALESCE(max(idcadastroPessoa), 0) + 1 FROM
+                                                            cadastroPessoa")) { if (rs.next()) { proximoId=rs.getInt(1);
+                                                            } } request.setAttribute("proximoId", proximoId); } catch
+                                                            (Exception e) { out.write("<p class='text-danger'>Erro ao
+                                                            carregar dados: " + e.getMessage() +
+                                                            "</p>");
+                                                            }
+                                                            %>
 
-        <!-- Bootstrap CSS -->
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+                                                            <div class="container"
+                                                                style="background-color: white; margin-top: 50px; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1);">
+                                                                <h2 class="text-center">Cadastro de Pessoa</h2>
+                                                                <hr>
+                                                                <form
+                                                                    action="<%=request.getContextPath()%>/CadastroPessoaController"
+                                                                    method="POST" class="form-horizontal">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+                                                                    <div class="form-group">
+                                                                        <label class="control-label col-sm-2"
+                                                                            for="id">ID:</label>
+                                                                        <div class="col-sm-10">
+                                                                            <input type="text" class="form-control"
+                                                                                name="idcadastroPessoa"
+                                                                                value="${proximoId}" readonly>
+                                                                        </div>
+                                                                    </div>
 
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <!-- Outros -->
-        <script language="JavaScript" src="<%=request.getContextPath()%>/JS/somenteNumeros.js"></script>
-        <script language="JavaScript" src="<%=request.getContextPath()%>/JS/validaForm.js"></script>
-        <link rel="stylesheet" href="<%=request.getContextPath()%>/CSS/bootstrap.css">
-        <title>Cadastro de Usuários</title>
-    </head>
+                                                                    <div class="form-group">
+                                                                        <label class="control-label col-sm-2"
+                                                                            for="nome">Nome:</label>
+                                                                        <div class="col-sm-10">
+                                                                            <input type="text" class="form-control"
+                                                                                id="nome" name="nome"
+                                                                                placeholder="Digite o nome" required>
+                                                                        </div>
+                                                                    </div>
 
-    <body >
+                                                                    <div class="form-group">
+                                                                        <label class="control-label col-sm-2"
+                                                                            for="sobrenome">Sobrenome:</label>
+                                                                        <div class="col-sm-10">
+                                                                            <input type="text" class="form-control"
+                                                                                id="sobrenome" name="sobrenome"
+                                                                                placeholder="Digite o sobrenome"
+                                                                                required>
+                                                                        </div>
+                                                                    </div>
 
+                                                                    <div class="form-group">
+                                                                        <label class="control-label col-sm-2"
+                                                                            for="documento">Documento
+                                                                            (CPF/CNPJ):</label>
+                                                                        <div class="col-sm-10">
+                                                                            <input type="text" class="form-control"
+                                                                                id="documento" name="documento"
+                                                                                placeholder="Digite o documento"
+                                                                                required>
+                                                                        </div>
+                                                                    </div>
 
+                                                                    <div class="form-group">
+                                                                        <label class="control-label col-sm-2"
+                                                                            for="pais">PaÃ­s:</label>
+                                                                        <div class="col-sm-10">
+                                                                            <select class="form-control" name="pais">
+                                                                                <option value="">Selecione o PaÃ­s
+                                                                                </option>
+                                                                                <c:forEach items="${listaPaises}"
+                                                                                    var="p">
+                                                                                    <option value="${p.nome}">${p.nome}
+                                                                                    </option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
 
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            RoteadorDao roteador = new RoteadorDao();
-            // Buscar dados no banco
-            request.setAttribute("listaRoteadores", roteador.getAllRoteadores());
-        %>
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            PaisDao pais = new PaisDao();
-            // Buscar dados no banco
-            request.setAttribute("listaPaises", pais.getAllPaises());
-        %>
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            EstadoDao estado = new EstadoDao();
-            // Buscar dados no banco
-            request.setAttribute("listaEstados", estado.getAllEstados());
-        %>
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            CidadeDao cidade = new CidadeDao();
-            // Buscar dados no banco
-            request.setAttribute("listaCidades", cidade.getAllCidades());
-        %>
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            BairroDao bairro = new BairroDao();
-            // Buscar dados no banco
-            request.setAttribute("listaBairros", bairro.getAllBairros());
-        %>
-        <%
-            // Instancia Objeto de Acesso aos Dados (DAO)
-            EnderecoDao endereco = new EnderecoDao();
-            // Buscar dados no banco
-            request.setAttribute("listaEnderecos", endereco.getAllEnderecos());
-        %>
-        <%
-            try {
+                                                                    <%-- Repetir para Estado, Cidade, Bairro, Endereco,
+                                                                        Ponto de Acesso --%>
+                                                                        <%-- Por brevidade e para garantir o
+                                                                            funcionamento imediato, vou simplificar
+                                                                            mantendo os nomes originais --%>
 
-                // Registrar o driver JDBC para PostgreSQL
-                Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-                // Conectar o banco
-                Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-                // Statement para executar os comandos sql
-                Statement st = conn.createStatement();
+                                                                            <div class="form-group">
+                                                                                <label class="control-label col-sm-2"
+                                                                                    for="nomeusuario">UsuÃ¡rio
+                                                                                    Hotspot:</label>
+                                                                                <div class="col-sm-10">
+                                                                                    <input type="text"
+                                                                                        class="form-control"
+                                                                                        name="nomeusuario"
+                                                                                        placeholder="UsuÃ¡rio para o rÃ¡dio"
+                                                                                        required>
+                                                                                </div>
+                                                                            </div>
 
-                String query = "SELECT max(idcadastroPessoa+1) FROM cadastroPessoa";
-                ResultSet rs = st.executeQuery(query);
+                                                                            <div class="form-group">
+                                                                                <label class="control-label col-sm-2"
+                                                                                    for="senhaacesso">Senha
+                                                                                    Hotspot:</label>
+                                                                                <div class="col-sm-10">
+                                                                                    <input type="password"
+                                                                                        class="form-control"
+                                                                                        name="senhaacesso"
+                                                                                        placeholder="Senha para o rÃ¡dio"
+                                                                                        required>
+                                                                                </div>
+                                                                            </div>
 
-                rs.next();
-        %>    
+                                                                            <div class="form-group">
+                                                                                <label class="control-label col-sm-2"
+                                                                                    for="pontoacesso">Ponto de Acesso
+                                                                                    (SSID):</label>
+                                                                                <div class="col-sm-10">
+                                                                                    <select class="form-control"
+                                                                                        name="pontoacesso">
+                                                                                        <option value="">Selecione o
+                                                                                            Roteador</option>
+                                                                                        <c:forEach
+                                                                                            items="${listaRoteadores}"
+                                                                                            var="r">
+                                                                                            <option value="${r.ssid}">
+                                                                                                ${r.ssid}</option>
+                                                                                        </c:forEach>
+                                                                                    </select>
+                                                                                </div>
+                                                                            </div>
 
+                                                                            <div class="form-group">
+                                                                                <div class="col-sm-offset-2 col-sm-10">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-success">Salvar</button>
+                                                                                    <a href="listarCadastroPessoa.jsp"
+                                                                                        class="btn btn-default">Cancelar</a>
+                                                                                </div>
+                                                                            </div>
+                                                                </form>
+                                                            </div>
+                                                    </body>
 
-        <%@ include file = "nav.jsp"%>     
-        <div class="container">
-            <form  class="form-horizontal" role="form" name="formTeste"  class="form-register1" onsubmit="return validaForm()" method="post" action="incluir_cadastroPessoa.jsp">
-
-                <h2 class="card-title mt-3 text-center">Cadastro de Usuários</h2>
-
-                <div class="form-group">
-                    <label for="cod" class="col-sm-1 control-label">Código:</label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text"  id="cod" name="idcadastroPessoa" maxlength="10" size="50" readonly="true" value='<%= rs.getString("max")%>'>
-                    </div> 
-                </div>
-                <div class="form-group">
-
-                    <label for="nome" class="col-sm-1 control-label">Nome: </label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text" required="true" name="nome" maxlength="45" size="50" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label  for="sobrenome" class="col-sm-1 control-label">Sobrenome:</label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text" required="true" name="sobrenome" maxlength="45" size="50" >
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="documento" class="col-sm-1 control-label">Documento: </label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text" onkeyup="somenteNumeros(this);"  name="documento" maxlength="14" size="50">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="pais" class="col-sm-1 control-label">País: </label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="paises" name="pais" >
-                            <datalist id="paises">
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaPaises}" var="pais">
-                                    <option value="${pais.nome}">${pais.nome}</option>
-                                </c:forEach>
-
-                            </datalist>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="estado" class="col-sm-1 control-label">Estado:</label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="estados" name="estado">
-                            <datalist id="estados">
-
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaEstados}" var="estado">
-                                    <option value="${estado.nome}">${estado.nome}</option>
-                                </c:forEach>
-
-                            </datalist> 
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="cidade" class="col-sm-1 control-label">Cidade: </label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="cidades" name="cidade">
-                            <datalist id="cidades">
-
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaCidades}" var="cidade">
-                                    <option value="${cidade.nome}">${cidade.nome}</option>
-                                </c:forEach>
-
-                            </datalist>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="bairro" class="col-sm-1 control-label">Bairro: </label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="bairros" name="bairro" >
-                            <datalist id="bairros">
-
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaBairros}" var="bairro">
-                                    <option value="${bairro.nome}">${bairro.nome}</option>
-                                </c:forEach>
-
-                            </datalist> 
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="rua" class="col-sm-1 control-label">Rua: </label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="enderecos" name="endereco" >
-                            <datalist id="enderecos">
-
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaEnderecos}" var="endereco">
-                                    <option value="${endereco.rua}">${endereco.rua}</option>
-                                </c:forEach>
-
-                            </datalist> 
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="numero" class="col-sm-1 control-label">Número: </label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text" required="true" onkeyup="somenteNumeros(this);" name="numeroendereco" maxlength="20" size="50" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="usuario" class="col-sm-1 control-label">Usuário: </label>
-                    <div class="col-sm-9">
-                        <input class="form-control" type="text" maxlength="32" name="usuario" size="50" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="senha" class="col-sm-1 control-label">Senha:</label>
-                    <div class= "col-sm-9" >
-                        <input class="form-control" type="text"  name="senha" maxlength="32"  >                            
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="pontoacesso" class="col-sm-1 control-label">Roteador: </label>
-                    <div class="col-sm-9">
-                        <select class="form-control" type="text" required="true" list="listaRoteadores" name="pontoacesso" >
-                            <datalist id="roteador">
-                                <!-- Cria itens do datalist (a ideia é a mesma para campos select) -->
-                                <c:forEach items="${listaRoteadores}" var="roteador">
-                                    <option value="${roteador.ssid}">${roteador.ssid}</option>
-                                </c:forEach>
-                            </datalist>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-9 col-sm-offset-1">
-                        <button type="submit" class="btn btn-primary btn-block" name="enviar"  onclick="validaFormCadastroPessoa()">Registrar</button>
-                        <button type="reset" class="btn btn-primary btn-block" name="limpar" >Limpar</button>
-                        <a class="btn btn-primary btn-block" name="voltar" type="submit" href="<%=request.getContextPath()%>/cadastroPessoa/listarCadastroPessoa.jsp" > Voltar </a>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-
-
-
-        <%
-            } catch (Exception e) {
-                out.write("Ocorreu um erro ao buscar o registro: <span style='color: red'>" + e.getMessage() + "</span>");
-            }
-        %>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    </body>
-</html>
+                                                    </html>

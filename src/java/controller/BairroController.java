@@ -6,6 +6,7 @@
 package controller;
 
 import dao.BairroDao;
+import service.BairroService;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,16 +24,16 @@ public class BairroController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/view/formBairro.jsp";
-    private static String VIEW_LISTAR = "/view/listaBairros.jsp";
+    private static String VIEW_INSERT_EDIT = "/endereco/incluirBairro.jsp";
+    private static String VIEW_LISTAR = "/endereco/listarBairros.jsp";
 
-    private BairroDao dao;
+    private BairroService servico;
 
     public BairroController() {
         super();
 
         // Instanciar um objeto do tipo BairroDao, que já possuirá a conexão ao banco
-        dao = new BairroDao();
+        servico = new BairroService();
     }
 
     @Override
@@ -43,37 +44,39 @@ public class BairroController extends HttpServlet {
         String acao = request.getParameter("acao");
         String encaminhar = "";
 
+        if (acao == null) {
+            acao = "listar";
+        }
+
         // Verificar qual foi a ação solicitada
         if (acao.equalsIgnoreCase("deletar")) {
 
             String codigoBairro = request.getParameter("idbairro");
-            dao.deleteBairro(Integer.parseInt(codigoBairro));
+            servico.excluir(Integer.parseInt(codigoBairro));
 
             encaminhar = VIEW_LISTAR;
 
-            request.setAttribute("bairros", dao.getAllBairros());
+            request.setAttribute("bairros", servico.listar());
 
         } else if (acao.equalsIgnoreCase("editar")) {
 
-            encaminhar = VIEW_INSERT_EDIT;
+            encaminhar = "/endereco/editarBairro.jsp";
             String codigoBairro = request.getParameter("idbairro");
 
-            Bairro bairro = dao.getBairroByCodigo(Integer.parseInt(codigoBairro));
-            request.setAttribute("bairro", bairro);
+            model.Bairro bairro = servico.getById(Integer.parseInt(codigoBairro));
+            request.setAttribute("bai", bairro);
 
         } else if (acao.equalsIgnoreCase("listar")) {
 
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("bairros", dao.getAllBairros());
+            request.setAttribute("bairros", servico.listar());
 
         } else {
             encaminhar = VIEW_INSERT_EDIT;
         }
 
         // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        // Encaminhar para a view
-        view.forward(request, response);
+        request.getRequestDispatcher(encaminhar).forward(request, response);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class BairroController extends HttpServlet {
             throws ServletException, IOException {
 
         // Instanciar objeto bairro
-        Bairro bairro = new Bairro();
+        model.Bairro bairro = new model.Bairro();
 
         // Atribuir parâmetros recebidos
         bairro.setNome(request.getParameter("nome"));
@@ -92,21 +95,17 @@ public class BairroController extends HttpServlet {
         // Se não tiver, deve-se inserir uma nova bairro
         if (codigoBairro == null || codigoBairro.isEmpty()) {
 
-            dao.insertBairro(bairro);
+            servico.salvar(bairro);
 
         } else { // Se tiver código, significa que deve atualizar
 
             bairro.setIdbairro(Integer.parseInt(codigoBairro));
-            dao.updateBairro(bairro);
+            servico.salvar(bairro);
 
         }
 
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        // Adicionar atributo
-        request.setAttribute("bairros", dao.getAllBairros());
-        // Encaminhar para a view
-        view.forward(request, response);
+        // Redirecionar para a lista de bairros
+        response.sendRedirect(request.getContextPath() + VIEW_LISTAR);
     }
 
     @Override

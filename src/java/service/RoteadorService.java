@@ -12,7 +12,7 @@ public class RoteadorService {
         this.dao = new RoteadorDao();
     }
 
-    public List<Roteador> listarTodos() {
+    public List<Roteador> listar() {
         return dao.getAllRoteadores();
     }
 
@@ -28,7 +28,7 @@ public class RoteadorService {
         dao.deleteRoteador(id);
     }
 
-    public Roteador buscarPorId(int id) {
+    public Roteador getById(int id) {
         return dao.getRoteadorByCodigo(id);
     }
 

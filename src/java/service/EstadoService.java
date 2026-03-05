@@ -11,7 +11,7 @@ public class EstadoService {
         this.dao = new EstadoDao();
     }
 
-    public List<Estado> listarTodos() {
+    public List<Estado> listar() {
         return dao.getAllEstados();
     }
 
@@ -27,7 +27,7 @@ public class EstadoService {
         dao.deleteEstado(id);
     }
 
-    public Estado buscarPorId(int id) {
+    public Estado getById(int id) {
         return dao.getEstadoByCodigo(id);
     }
 }

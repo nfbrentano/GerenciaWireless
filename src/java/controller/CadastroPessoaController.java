@@ -44,21 +44,21 @@ public class CadastroPessoaController extends HttpServlet {
                 }
             }
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("cadastroPessoas", service.listarTodos());
+            request.setAttribute("cadastroPessoas", service.listar());
 
         } else if (acao != null && acao.equalsIgnoreCase("editar")) {
 
             encaminhar = VIEW_INSERT_EDIT;
             String id = request.getParameter("idcadastroPessoa");
             if (id != null) {
-                CadastroPessoa pessoa = service.buscarPorId(Integer.parseInt(id));
+                CadastroPessoa pessoa = service.getById(Integer.parseInt(id));
                 request.setAttribute("cadastroPessoa", pessoa);
             }
 
         } else if (acao != null && acao.equalsIgnoreCase("listar")) {
 
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("cadastroPessoas", service.listarTodos());
+            request.setAttribute("cadastroPessoas", service.listar());
 
         } else {
             encaminhar = VIEW_INSERT_EDIT;
@@ -102,7 +102,7 @@ public class CadastroPessoaController extends HttpServlet {
 
         // Redireciona para a listagem
         RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        request.setAttribute("cadastroPessoas", service.listarTodos());
+        request.setAttribute("cadastroPessoas", service.listar());
         view.forward(request, response);
     }
 }

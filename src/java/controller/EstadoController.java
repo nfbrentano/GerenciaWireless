@@ -23,90 +23,65 @@ public class EstadoController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/view/formEstado.jsp";
-    private static String VIEW_LISTAR = "/view/listaEstados.jsp";
+    private static String VIEW_INSERT_EDIT = "/endereco/incluirEstado.jsp";
+    private static String VIEW_LISTAR = "/endereco/listarEstados.jsp";
 
-    private EstadoDao dao;
+    private service.EstadoService servico;
 
     public EstadoController() {
         super();
-
-        // Instanciar um objeto do tipo EstadoDao, que já possuirá a conexão ao banco
-        dao = new EstadoDao();
+        servico = new service.EstadoService();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Buscar a ação requisitada
         String acao = request.getParameter("acao");
         String encaminhar = "";
 
-        // Verificar qual foi a ação solicitada
+        if (acao == null) {
+            acao = "listar";
+        }
+
         if (acao.equalsIgnoreCase("deletar")) {
-
             String codigoEstado = request.getParameter("idestado");
-            dao.deleteEstado(Integer.parseInt(codigoEstado));
-
+            servico.excluir(Integer.parseInt(codigoEstado));
             encaminhar = VIEW_LISTAR;
-
-            request.setAttribute("estados", dao.getAllEstados());
-
+            request.setAttribute("estados", servico.listar());
         } else if (acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = VIEW_INSERT_EDIT;
+            encaminhar = "/endereco/editarEstado.jsp";
             String codigoEstado = request.getParameter("idestado");
-
-            Estado estado = dao.getEstadoByCodigo(Integer.parseInt(codigoEstado));
-            request.setAttribute("estado", estado);
-
+            model.Estado estado = servico.getById(Integer.parseInt(codigoEstado));
+            request.setAttribute("est", estado);
         } else if (acao.equalsIgnoreCase("listar")) {
-
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("estados", dao.getAllEstados());
-
+            request.setAttribute("estados", servico.listar());
         } else {
             encaminhar = VIEW_INSERT_EDIT;
         }
 
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        // Encaminhar para a view
-        view.forward(request, response);
+        request.getRequestDispatcher(encaminhar).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar objeto estado
-        Estado estado = new Estado();
-
-        // Atribuir parâmetros recebidos
+        model.Estado estado = new model.Estado();
         estado.setNome(request.getParameter("nome"));
+        estado.setSigla(request.getParameter("sigla"));
         estado.setPais_idpais(request.getParameter("pais_idpais"));
         String codigoEstado = request.getParameter("idestado");
 
-        // Verificar se tem código.
-        // Se não tiver, deve-se inserir uma nova estado
         if (codigoEstado == null || codigoEstado.isEmpty()) {
-
-            dao.insertEstado(estado);
-
-        } else { // Se tiver código, significa que deve atualizar
-
+            servico.salvar(estado);
+        } else {
             estado.setIdestado(Integer.parseInt(codigoEstado));
-            dao.updateEstado(estado);
-
+            servico.salvar(estado);
         }
 
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        // Adicionar atributo
-        request.setAttribute("estados", dao.getAllEstados());
-        // Encaminhar para a view
-        view.forward(request, response);
+        response.sendRedirect(request.getContextPath() + VIEW_LISTAR);
     }
 
     @Override

@@ -1,38 +1,32 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import dao.RoteadorDao;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.Roteador;
+import service.RoteadorService;
 
 /**
- *
+ * Controller para ações relacionadas a roteador
  * @author natan
  */
 public class RoteadorController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    
     // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/view/formRoteador.jsp";
-    private static String VIEW_LISTAR = "/view/listaRoteadores.jsp";
-    private RoteadorDao dao;
+    private static final String VIEW_INSERT_EDIT = "/conexao/incluirCadastroRoteador.jsp";
+    private static final String VIEW_LISTAR = "/conexao/listarRoteador.jsp";
+    private static final String VIEW_EDIT = "/conexao/editarCadastroRoteador.jsp";
+    
+    private final RoteadorService service;
 
     public RoteadorController() {
         super();
-        // Instanciar um objeto do tipo RoteadorDao, que já possuirá a conexão ao banco
-        dao = new RoteadorDao();
+        this.service = new RoteadorService();
     }
 
     @Override
@@ -44,27 +38,29 @@ public class RoteadorController extends HttpServlet {
         String encaminhar = "";
 
         // Verificar qual foi a ação solicitada
-        if (acao.equalsIgnoreCase("deletar")) {
+        if (acao != null && acao.equalsIgnoreCase("deletar")) {
 
             String codigoRoteador = request.getParameter("idpontoacesso");
-            dao.deleteRoteador(Integer.parseInt(codigoRoteador));
+            if (codigoRoteador != null) {
+                service.excluir(Integer.parseInt(codigoRoteador));
+            }
 
             encaminhar = VIEW_LISTAR;
+            request.setAttribute("roteadores", service.listar());
 
-            request.setAttribute("roteadoeres", dao.getAllRoteadores());
+        } else if (acao != null && acao.equalsIgnoreCase("editar")) {
 
-        } else if (acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = VIEW_INSERT_EDIT;
+            encaminhar = VIEW_EDIT;
             String codigoRoteador = request.getParameter("idpontoacesso");
+            if (codigoRoteador != null) {
+                Roteador roteador = service.getById(Integer.parseInt(codigoRoteador));
+                request.setAttribute("roteador", roteador);
+            }
 
-            Roteador roteador = dao.getRoteadorByCodigo(Integer.parseInt(codigoRoteador));
-            request.setAttribute("roteador", roteador);
-
-        } else if (acao.equalsIgnoreCase("listar")) {
+        } else if (acao != null && acao.equalsIgnoreCase("listar")) {
 
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("roteadores", dao.getAllRoteadores());
+            request.setAttribute("roteadores", service.listar());
 
         } else {
             encaminhar = VIEW_INSERT_EDIT;
@@ -91,30 +87,19 @@ public class RoteadorController extends HttpServlet {
         roteador.setIproteador(request.getParameter("iproteador"));
         roteador.setUsuario(request.getParameter("usuario"));
         roteador.setPass(request.getParameter("pass"));
+        
         String codigoRoteador = request.getParameter("idpontoacesso");
 
         // Verificar se tem código.
-        // Se não tiver, deve-se inserir uma nova roteador
-        if (codigoRoteador == null || codigoRoteador.isEmpty()) {
-
-            dao.insertRoteador(roteador);
-
-        } else { // Se tiver código, significa que deve atualizar
-
+        if (codigoRoteador != null && !codigoRoteador.isEmpty()) {
             roteador.setIdpontoacesso(Integer.parseInt(codigoRoteador));
-            try {
-                dao.updateRoteador(roteador);
-            } catch (SQLException ex) {
-                Logger.getLogger(RoteadorController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
         }
+        
+        service.salvar(roteador);
 
-        // Dispatcher para onde será redirecionado
+        // Redireciona para a listagem
         RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        // Adicionar atributo
-        request.setAttribute("roteadores", dao.getAllRoteadores());
-        // Encaminhar para a view
+        request.setAttribute("roteadores", service.listar());
         view.forward(request, response);
     }
 

@@ -26,7 +26,7 @@
 <%@page import="java.sql.Statement"%>
 <%@page import="java.sql.DriverManager"%>
 <%@page import="java.sql.Connection"%>
-<%-- Para poder utilizar a jstl é necessário adicionar o respectivo .jar nas bibliotecas --%>
+<%-- Para poder utilizar a jstl Ã© necessÃ¡rio adicionar o respectivo .jar nas bibliotecas --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>

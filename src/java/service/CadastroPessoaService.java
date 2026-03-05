@@ -16,7 +16,7 @@ public class CadastroPessoaService {
         this.roteadorDao = new RoteadorDao();
     }
 
-    public List<CadastroPessoa> listarTodos() {
+    public List<CadastroPessoa> listar() {
         return pessoaDao.getAllCadastroPessoa();
     }
 
@@ -50,7 +50,7 @@ public class CadastroPessoaService {
         pessoaDao.deleteCadastroPessoa(id);
     }
 
-    public CadastroPessoa buscarPorId(int id) {
+    public CadastroPessoa getById(int id) {
         return pessoaDao.getCadastroPessoaByCodigo(id);
     }
 }

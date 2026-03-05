@@ -11,7 +11,7 @@ public class CidadeService {
         this.dao = new CidadeDao();
     }
 
-    public List<Cidade> listarTodas() {
+    public List<Cidade> listar() {
         return dao.getAllCidades();
     }
 
@@ -27,7 +27,7 @@ public class CidadeService {
         dao.deleteCidade(id);
     }
 
-    public Cidade buscarPorId(int id) {
+    public Cidade getById(int id) {
         return dao.getCidadeByCodigo(id);
     }
 }
