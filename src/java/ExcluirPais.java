@@ -33,25 +33,17 @@ public class ExcluirPais extends HttpServlet {
             throws ServletException, IOException {
         String cod = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
+        if (cod != null) {
+            try {
+                service.PaisService service = new service.PaisService();
+                service.excluir(Integer.parseInt(cod));
 
-            // SQL para excluir
-            String query = "UPDATE pais SET disponibilidade = false WHERE idpais = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(cod));
-                st.executeUpdate();
+                request.getRequestDispatcher("/endereco/listarPaises.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o país: " + e.getMessage() + "'); window.location.href='endereco/listarPaises.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/endereco/listarPaises.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o endereço: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/endereco/listarPaises.jsp");
         }
     }
 

@@ -33,25 +33,17 @@ public class ExcluirRoteador extends HttpServlet {
             throws ServletException, IOException {
         String idpontoacesso = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
+        if (idpontoacesso != null) {
+            try {
+                service.RoteadorService service = new service.RoteadorService();
+                service.excluir(Integer.parseInt(idpontoacesso));
 
-            // SQL para excluir
-            String query = "UPDATE pontoacesso SET disponibilidade = false WHERE idpontoacesso = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(idpontoacesso));
-                st.executeUpdate();
+                request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o roteador: " + e.getMessage() + "'); window.location.href='conexao/listarRoteador.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o roteador: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/conexao/listarRoteador.jsp");
         }
     }
 

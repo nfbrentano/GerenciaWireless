@@ -36,36 +36,19 @@ public class ReiniciarRoteador extends HttpServlet {
             throws ServletException, IOException {
         String idroteador = request.getParameter("cod");
 
-        try {
+        if (idroteador != null) {
+            try {
+                service.RoteadorService service = new service.RoteadorService();
+                service.reiniciar(Integer.parseInt(idroteador));
 
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
-            
-            // Usar PreparedStatement para evitar Injeção de SQL
-            String sql = "SELECT iproteador, usuario, pass FROM pontoacesso WHERE idpontoacesso = ?";
-            try (java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
-                st.setInt(1, Integer.parseInt(idroteador));
-                
-                try (ResultSet res = st.executeQuery()) {
-                    if (res.next()) {
-                        String ip = res.getString("iproteador");
-                        String userroteador = res.getString("usuario");
-                        String passwordroteador = res.getString("pass");
-                        
-                        ApiConnection apiCon = ApiConnection.connect(ip);
-                        apiCon.login(userroteador, passwordroteador);
-                        apiCon.execute("/system/reboot");
-                        apiCon.close();
-                       
-                        request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
-                    }
-                }
+                request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao reiniciar o roteador: " + e.getMessage() + "'); window.location.href='conexao/listarRoteador.jsp';</script>");
             }
-
-                   
-                    // Encaminha para a listagem 
-                    request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
-                }
+        } else {
+            response.sendRedirect(request.getContextPath() + "/conexao/listarRoteador.jsp");
+        }
+    }
            
 
         } catch (Exception e) {

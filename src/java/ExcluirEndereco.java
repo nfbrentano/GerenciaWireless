@@ -33,25 +33,17 @@ public class ExcluirEndereco extends HttpServlet {
             throws ServletException, IOException {
         String idendereco = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
+        if (idendereco != null) {
+            try {
+                service.EnderecoService service = new service.EnderecoService();
+                service.excluir(Integer.parseInt(idendereco));
 
-            // SQL para excluir
-            String query = "UPDATE endereco SET disponibilidade = false WHERE idendereco = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(idendereco));
-                st.executeUpdate();
+                request.getRequestDispatcher("/endereco/listarEnderecos.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o endereço: " + e.getMessage() + "'); window.location.href='endereco/listarEnderecos.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/endereco/listarEnderecos.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o endereço: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/endereco/listarEnderecos.jsp");
         }
     }
 

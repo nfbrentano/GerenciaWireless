@@ -33,25 +33,17 @@ public class ExcluirEstado extends HttpServlet {
             throws ServletException, IOException {
         String idestado = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
+        if (idestado != null) {
+            try {
+                service.EstadoService service = new service.EstadoService();
+                service.excluir(Integer.parseInt(idestado));
 
-            // SQL para excluir
-            String query = "UPDATE estado SET disponibilidade = false WHERE idestado = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(idestado));
-                st.executeUpdate();
+                request.getRequestDispatcher("/endereco/listarEstados.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o estado: " + e.getMessage() + "'); window.location.href='endereco/listarEstados.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/endereco/listarEstados.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o endereço: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/endereco/listarEstados.jsp");
         }
     }
 
