@@ -1,62 +1,32 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import me.legrange.mikrotik.ApiConnection;
-import me.legrange.mikrotik.MikrotikApiException;
-import model.Frequencia;
 import model.Roteador;
 import util.Db;
 
-/**
- *
- * @author natan
- */
 public class RoteadorDao {
-    // Atributo para armazenar a conexao com o banco de dados
-
-    private Connection conexao;
 
     public RoteadorDao() {
-        // Executa o método estático para realizar a conexão
-        conexao = Db.getConexao();
-    }
-
-    public int IdRoteador() throws SQLException {
-        String sql = "select max(idpontoacesso+1) from pontoacesso";
-        PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-        return 0;
-    }
-
-    public ResultSet ipRoteador(int idpontoacesso) throws SQLException {
-        String sql = "select iproteador from pontoacesso WHERE idpontoacesso =?";
-        PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-        preparedStatement.setInt(1, idpontoacesso);
-        ResultSet rs = preparedStatement.executeQuery();
-
-        return (ResultSet) rs.getObject("iproteador");
     }
 
     public void insertRoteador(Roteador roteador) {
-        try {
-            String sql = "INSERT INTO pontoacesso( ssid, modelo, largurabanda, frequencia, iproteador, usuario, pass, disponibilidade ) VALUES ( ?, true )";
+        String sql = "INSERT INTO pontoacesso(ssid, modelo, largurabanda, frequencia, iproteador, usuario, pass, disponibilidade) VALUES (?, ?, ?, ?, ?, ?, ?, true)";
+        try (Connection conexao = Db.getConexao();
+             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
-            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-
-            // Parâmetros iniciam com 1
             preparedStatement.setString(1, roteador.getSsid());
-
+            preparedStatement.setString(2, roteador.getModelo());
+            preparedStatement.setString(3, roteador.getLargurabanda());
+            preparedStatement.setString(4, roteador.getFrequencia());
+            preparedStatement.setString(5, roteador.getIproteador());
+            preparedStatement.setString(6, roteador.getUsuario());
+            preparedStatement.setString(7, roteador.getPass());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -65,10 +35,10 @@ public class RoteadorDao {
     }
 
     public void deleteRoteador(int codigoRoteador) {
-        try {
-            String sql = "UPDATE pontoacesso SET disponibilidade=false WHERE idpontoacesso=?";
-            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
-            // Parâmetros iniciam com 1
+        String sql = "UPDATE pontoacesso SET disponibilidade=false WHERE idpontoacesso=?";
+        try (Connection conexao = Db.getConexao();
+             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+
             preparedStatement.setInt(1, codigoRoteador);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -76,14 +46,19 @@ public class RoteadorDao {
         }
     }
 
-    public void updateRoteador(Roteador roteador) throws SQLException {
-        try {
-            String sql = "UPDATE pontoacesso SET ssid=?, modelo=?, largurabanda=?, frequencia=?, iproteador=?, usuario=?, pass=? WHERE idpontoacesso=?";
-            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
+    public void updateRoteador(Roteador roteador) {
+        String sql = "UPDATE pontoacesso SET ssid=?, modelo=?, largurabanda=?, frequencia=?, iproteador=?, usuario=?, pass=? WHERE idpontoacesso=?";
+        try (Connection conexao = Db.getConexao();
+             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
 
-            // Parâmetros iniciam com 1
             preparedStatement.setString(1, roteador.getSsid());
-            preparedStatement.setInt(2, roteador.getIdpontoacesso());
+            preparedStatement.setString(2, roteador.getModelo());
+            preparedStatement.setString(3, roteador.getLargurabanda());
+            preparedStatement.setString(4, roteador.getFrequencia());
+            preparedStatement.setString(5, roteador.getIproteador());
+            preparedStatement.setString(6, roteador.getUsuario());
+            preparedStatement.setString(7, roteador.getPass());
+            preparedStatement.setInt(8, roteador.getIdpontoacesso());
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -92,11 +67,11 @@ public class RoteadorDao {
     }
 
     public List<Roteador> getAllRoteadores() {
-        List<Roteador> roteadores = new ArrayList<Roteador>();
-
-        try {
-            Statement statement = conexao.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM pontoacesso WHERE disponibilidade = true ORDER BY ssid");
+        List<Roteador> roteadores = new ArrayList<>();
+        String sql = "SELECT * FROM pontoacesso WHERE disponibilidade = true ORDER BY ssid";
+        try (Connection conexao = Db.getConexao();
+             Statement statement = conexao.createStatement();
+             ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 Roteador roteador = new Roteador();
                 roteador.setIdpontoacesso(rs.getInt("idpontoacesso"));
@@ -107,8 +82,6 @@ public class RoteadorDao {
                 roteador.setIproteador(rs.getString("iproteador"));
                 roteador.setUsuario(rs.getString("usuario"));
                 roteador.setPass(rs.getString("pass"));
-
-                // Adicionar à lista
                 roteadores.add(roteador);
             }
         } catch (SQLException e) {
@@ -118,33 +91,52 @@ public class RoteadorDao {
     }
 
     public Roteador getRoteadorByCodigo(int codigoRoteador) {
-        // Instanciar objeto que será retornado
-        Roteador roteadores = new Roteador();
-
-        try {
-            String sql = "SELECT * FROM pontoacesso WHERE idpontoacesso=?";
-
-            PreparedStatement preparedStatement = conexao.prepareStatement(sql);
+        Roteador roteador = null;
+        String sql = "SELECT * FROM pontoacesso WHERE idpontoacesso=?";
+        try (Connection conexao = Db.getConexao();
+             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
             preparedStatement.setInt(1, codigoRoteador);
-            ResultSet rs = preparedStatement.executeQuery();
-
-            // Atribuir retorno do banco aos atributos do objeto roteador
-            if (rs.next()) {
-                roteadores.setIdpontoacesso(rs.getInt("idpontoacesso"));
-                roteadores.setSsid(rs.getString("ssid"));
-                roteadores.setModelo(rs.getString("modelo"));
-                roteadores.setLargurabanda(rs.getString("largurabanda"));
-                roteadores.setFrequencia(rs.getString("frequencia"));
-                roteadores.setIproteador(rs.getString("iproteador"));
-                roteadores.setUsuario(rs.getString("usuario"));
-                roteadores.setPass(rs.getString("pass"));
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    roteador = new Roteador();
+                    roteador.setIdpontoacesso(rs.getInt("idpontoacesso"));
+                    roteador.setSsid(rs.getString("ssid"));
+                    roteador.setModelo(rs.getString("modelo"));
+                    roteador.setLargurabanda(rs.getString("largurabanda"));
+                    roteador.setFrequencia(rs.getString("frequencia"));
+                    roteador.setIproteador(rs.getString("iproteador"));
+                    roteador.setUsuario(rs.getString("usuario"));
+                    roteador.setPass(rs.getString("pass"));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return roteadores;
+        return roteador;
     }
 
-   
-
+    public Roteador getRoteadorBySsid(String ssid) {
+        Roteador roteador = null;
+        String sql = "SELECT * FROM pontoacesso WHERE ssid=?";
+        try (Connection conexao = Db.getConexao();
+             PreparedStatement preparedStatement = conexao.prepareStatement(sql)) {
+            preparedStatement.setString(1, ssid);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    roteador = new Roteador();
+                    roteador.setIdpontoacesso(rs.getInt("idpontoacesso"));
+                    roteador.setSsid(rs.getString("ssid"));
+                    roteador.setModelo(rs.getString("modelo"));
+                    roteador.setLargurabanda(rs.getString("largurabanda"));
+                    roteador.setFrequencia(rs.getString("frequencia"));
+                    roteador.setIproteador(rs.getString("iproteador"));
+                    roteador.setUsuario(rs.getString("usuario"));
+                    roteador.setPass(rs.getString("pass"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roteador;
+    }
 }

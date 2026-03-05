@@ -23,6 +23,15 @@ public class CadastroPessoa {
     private String numeroendereco;
     private String nomeusuario;
     private String senhaacesso;
+    private String pontoacesso;
+
+    public String getPontoacesso() {
+        return pontoacesso;
+    }
+
+    public void setPontoacesso(String pontoacesso) {
+        this.pontoacesso = pontoacesso;
+    }
 
     public String getNomeusuario() {
         return nomeusuario;

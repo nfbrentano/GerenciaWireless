@@ -35,54 +35,20 @@ public class ExcluirPessoa extends HttpServlet {
             throws ServletException, IOException {
         String idcadastropessoa = request.getParameter("cod");
 
-        try {
+        if (idcadastropessoa != null) {
+            try {
+                service.CadastroPessoaService service = new service.CadastroPessoaService();
+                service.excluir(Integer.parseInt(idcadastropessoa));
 
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
-
-            String sqlPessoa = "SELECT nomeusuario, pontoacesso FROM cadastropessoa WHERE idcadastropessoa = ?";
-            try (java.sql.PreparedStatement stPessoa = conn.prepareStatement(sqlPessoa)) {
-                stPessoa.setInt(1, Integer.parseInt(idcadastropessoa));
-                try (ResultSet rs = stPessoa.executeQuery()) {
-                    if (rs.next()) {
-                        String user = rs.getString("nomeusuario");
-                        String pontoacesso = rs.getString("pontoacesso");
-
-                        String sqlPonto = "SELECT iproteador, usuario, pass FROM pontoacesso WHERE ssid = ?";
-                        try (java.sql.PreparedStatement stPonto = conn.prepareStatement(sqlPonto)) {
-                            stPonto.setString(1, pontoacesso);
-                            try (ResultSet res = stPonto.executeQuery()) {
-                                if (res.next()) {
-                                    String ip = res.getString("iproteador");
-                                    String userroteador = res.getString("usuario");
-                                    String passwordroteador = res.getString("pass");
-                                    
-                                    ApiConnection apiCon = ApiConnection.connect(ip);
-                                    apiCon.login(userroteador, passwordroteador);
-                                    apiCon.execute("/ip/hotspot/user/remove numbers='" + user + "'");
-                                    apiCon.close();
-                                }
-                            }
-                        }
-
-                        // SQL para excluir (soft delete)
-                        String query = "UPDATE cadastropessoa SET disponibilidade = false WHERE idcadastropessoa = ?";
-                        try (java.sql.PreparedStatement stDel = conn.prepareStatement(query)) {
-                            stDel.setInt(1, Integer.parseInt(idcadastropessoa));
-                            stDel.executeUpdate();
-                        }
-
-                        // Encaminha para a listagem 
-                        request.getRequestDispatcher("/cadastroPessoa/listarCadastroPessoa.jsp").forward(request, response);
-                    }
-                }
+                // Encaminha para a listagem 
+                request.getRequestDispatcher("/cadastroPessoa/listarCadastroPessoa.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o usuário: " + e.getMessage() + "'); window.location.href='cadastroPessoa/listarCadastroPessoa.jsp';</script>");
             }
-
-
-                    // Encaminha para a listagem 
-                    request.getRequestDispatcher("/cadastroPessoa/listarCadastroPessoa.jsp").forward(request, response);
-                }
-            }
+        } else {
+            response.sendRedirect(request.getContextPath() + "/cadastroPessoa/listarCadastroPessoa.jsp");
+        }
+    }
 
         } catch (Exception e) {
             response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o usuário: '" + e.getMessage() + ")</script>");

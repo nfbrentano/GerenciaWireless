@@ -33,25 +33,17 @@ public class ExcluirCidade extends HttpServlet {
             throws ServletException, IOException {
         String idcidade = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
-
-            // SQL para excluir
-            String query = "UPDATE cidade SET disponibilidade = false WHERE idcidade = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(idcidade));
-                st.executeUpdate();
+        if (idcidade != null) {
+            try {
+                service.CidadeService service = new service.CidadeService();
+                service.excluir(Integer.parseInt(idcidade));
+                
+                request.getRequestDispatcher("/endereco/listarCidades.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir a cidade: " + e.getMessage() + "'); window.location.href='endereco/listarCidades.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/endereco/listarCidades.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o cidade: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/endereco/listarCidades.jsp");
         }
     }
 

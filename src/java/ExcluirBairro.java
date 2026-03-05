@@ -33,25 +33,17 @@ public class ExcluirBairro extends HttpServlet {
             throws ServletException, IOException {
         String idbairro = request.getParameter("cod");
 
-        try {
-            // Usar o utilitário de conexão padronizado
-            Connection conn = util.Db.getConexao();
+        if (idbairro != null) {
+            try {
+                service.BairroService service = new service.BairroService();
+                service.excluir(Integer.parseInt(idbairro));
 
-            // SQL para excluir
-            String query = "UPDATE bairro SET disponibilidade = false WHERE idbairro = ?";
-
-            // Executa o SQL de exclusão
-            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
-                st.setInt(1, Integer.parseInt(idbairro));
-                st.executeUpdate();
+                request.getRequestDispatcher("/endereco/listarBairros.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o bairro: " + e.getMessage() + "'); window.location.href='endereco/listarBairros.jsp';</script>");
             }
-
-
-            // Encaminha para a listagem 
-            request.getRequestDispatcher("/endereco/listarBairros.jsp").forward(request, response);
-
-        } catch (Exception e) {
-            response.getWriter().println("<script>alert('Ocorreu um erro ao excluir o bairro: '" + e.getMessage() + ")</script>");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/endereco/listarBairros.jsp");
         }
     }
 

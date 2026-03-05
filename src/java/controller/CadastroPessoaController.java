@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import dao.CadastroPessoaDao;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,26 +7,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.CadastroPessoa;
+import service.CadastroPessoaService;
 
-/**
- *
- * @author natan
- */
 public class CadastroPessoaController extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
     // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/view/formCadastroPessoa.jsp";
-    private static String VIEW_LISTAR = "/view/listaCadastroPessoa.jsp";
+    private static String VIEW_INSERT_EDIT = "/cadastroPessoa/incluirCadastroPessoa.jsp"; // Ajustado para o caminho correto
+    private static String VIEW_LISTAR = "/cadastroPessoa/listarCadastroPessoa.jsp";   // Ajustado para o caminho correto
 
-    private CadastroPessoaDao dao;
+    private CadastroPessoaService service;
 
     public CadastroPessoaController() {
         super();
-
-        // Instanciar um objeto do tipo CadastroPessoaDao, que já possuirá a conexão ao banco
-        dao = new CadastroPessoaDao();
+        service = new CadastroPessoaService();
     }
 
     @Override
@@ -44,27 +33,32 @@ public class CadastroPessoaController extends HttpServlet {
         String encaminhar = "";
 
         // Verificar qual foi a ação solicitada
-        if (acao.equalsIgnoreCase("deletar")) {
+        if (acao != null && acao.equalsIgnoreCase("deletar")) {
 
-            String codigoCadastroPessoa = request.getParameter("idcadastroPessoa");
-            dao.deleteCadastroPessoa(Integer.parseInt(codigoCadastroPessoa));
-
+            String id = request.getParameter("idcadastroPessoa");
+            if (id != null) {
+                try {
+                    service.excluir(Integer.parseInt(id));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             encaminhar = VIEW_LISTAR;
+            request.setAttribute("cadastroPessoas", service.listarTodos());
 
-            request.setAttribute("cadastroPessoa", dao.getAllCadastroPessoa());
-
-        } else if (acao.equalsIgnoreCase("editar")) {
+        } else if (acao != null && acao.equalsIgnoreCase("editar")) {
 
             encaminhar = VIEW_INSERT_EDIT;
-            String codigoCadastroPessoa = request.getParameter("idcadastroPessoa");
+            String id = request.getParameter("idcadastroPessoa");
+            if (id != null) {
+                CadastroPessoa pessoa = service.buscarPorId(Integer.parseInt(id));
+                request.setAttribute("cadastroPessoa", pessoa);
+            }
 
-            CadastroPessoa cadastroPessoa = dao.getCadastroPessoaByCodigo(Integer.parseInt(codigoCadastroPessoa));
-            request.setAttribute("cadastroPessoa", cadastroPessoa);
-
-        } else if (acao.equalsIgnoreCase("listar")) {
+        } else if (acao != null && acao.equalsIgnoreCase("listar")) {
 
             encaminhar = VIEW_LISTAR;
-            request.setAttribute("cadastroPessoa", dao.getAllCadastroPessoa());
+            request.setAttribute("cadastroPessoas", service.listarTodos());
 
         } else {
             encaminhar = VIEW_INSERT_EDIT;
@@ -80,10 +74,10 @@ public class CadastroPessoaController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar objeto cadastroPessoa
+        // Instanciar novo objeto da model CadastroPessoa
         CadastroPessoa cadastroPessoa = new CadastroPessoa();
 
-        // Atribuir parâmetros recebidos
+        // Atribuir valores vindos da view via "name" ao objeto da model
         cadastroPessoa.setNome(request.getParameter("nome"));
         cadastroPessoa.setSobrenome(request.getParameter("sobrenome"));
         cadastroPessoa.setDocumento(request.getParameter("documento"));
@@ -95,32 +89,20 @@ public class CadastroPessoaController extends HttpServlet {
         cadastroPessoa.setNumeroendereco(request.getParameter("numeroendereco"));
         cadastroPessoa.setNomeusuario(request.getParameter("nomeusuario"));
         cadastroPessoa.setSenhaacesso(request.getParameter("senhaacesso"));
-        String codigoCadastroPessoa = request.getParameter("idcadastroPessoa");
+        cadastroPessoa.setPontoacesso(request.getParameter("pontoacesso"));
+        
+        String idStr = request.getParameter("idcadastroPessoa");
 
-        // Verificar se tem código.
-        // Se não tiver, deve-se inserir um novo cadastroPessoa
-        if (codigoCadastroPessoa == null || codigoCadastroPessoa.isEmpty()) {
-
-            dao.insertCadastroPessoa(cadastroPessoa);
-
-        } else { // Se tiver código, significa que deve atualizar
-
-            cadastroPessoa.setIdcadastroPessoa(Integer.parseInt(codigoCadastroPessoa));
-            dao.updateCadastroPessoa(cadastroPessoa);
-
+        // Se tiver ID, atualiza, senão insere
+        if (idStr != null && !idStr.isEmpty()) {
+            cadastroPessoa.setIdcadastroPessoa(Integer.parseInt(idStr));
         }
+        
+        service.salvar(cadastroPessoa);
 
-        // Dispatcher para onde será redirecionado
+        // Redireciona para a listagem
         RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        // Adicionar atributo
-        request.setAttribute("cadastroPessoa", dao.getAllCadastroPessoa());
-        // Encaminhar para a view
+        request.setAttribute("cadastroPessoas", service.listarTodos());
         view.forward(request, response);
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a cadastroPessoa";
-    }
-
 }
