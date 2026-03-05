@@ -1,7 +1,9 @@
 package controller;
 
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,98 +13,64 @@ import service.CadastroPessoaService;
 
 public class CadastroPessoaController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/cadastroPessoa/incluirCadastroPessoa.jsp"; // Ajustado para o caminho correto
-    private static String VIEW_LISTAR = "/cadastroPessoa/listarCadastroPessoa.jsp";   // Ajustado para o caminho correto
-
-    private CadastroPessoaService service;
+    private final CadastroPessoaService service;
+    private final Gson gson;
 
     public CadastroPessoaController() {
         super();
-        service = new CadastroPessoaService();
+        this.service = new CadastroPessoaService();
+        this.gson = new Gson();
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Buscar a ação requisitada
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        // Verificar qual foi a ação solicitada
-        if (acao != null && acao.equalsIgnoreCase("deletar")) {
-
-            String id = request.getParameter("idcadastroPessoa");
-            if (id != null) {
-                try {
-                    service.excluir(Integer.parseInt(id));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("cadastroPessoas", service.listar());
-
-        } else if (acao != null && acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = VIEW_INSERT_EDIT;
-            String id = request.getParameter("idcadastroPessoa");
-            if (id != null) {
-                CadastroPessoa pessoa = service.getById(Integer.parseInt(id));
-                request.setAttribute("cadastroPessoa", pessoa);
-            }
-
-        } else if (acao != null && acao.equalsIgnoreCase("listar")) {
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("cadastroPessoas", service.listar());
-
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            CadastroPessoa pessoa = service.getById(Integer.parseInt(idStr));
+            sendJsonResponse(response, pessoa);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        // Encaminhar para a view
-        view.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar novo objeto da model CadastroPessoa
-        CadastroPessoa cadastroPessoa = new CadastroPessoa();
-
-        // Atribuir valores vindos da view via "name" ao objeto da model
-        cadastroPessoa.setNome(request.getParameter("nome"));
-        cadastroPessoa.setSobrenome(request.getParameter("sobrenome"));
-        cadastroPessoa.setDocumento(request.getParameter("documento"));
-        cadastroPessoa.setPais(request.getParameter("pais"));
-        cadastroPessoa.setEstado(request.getParameter("estado"));
-        cadastroPessoa.setCidade(request.getParameter("cidade"));
-        cadastroPessoa.setBairro(request.getParameter("bairro"));
-        cadastroPessoa.setEndereco(request.getParameter("endereco"));
-        cadastroPessoa.setNumeroendereco(request.getParameter("numeroendereco"));
-        cadastroPessoa.setNomeusuario(request.getParameter("nomeusuario"));
-        cadastroPessoa.setSenhaacesso(request.getParameter("senhaacesso"));
-        cadastroPessoa.setPontoacesso(request.getParameter("pontoacesso"));
+        // Lê o body da requisição
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        CadastroPessoa pessoa = gson.fromJson(jsonBody, CadastroPessoa.class);
         
-        String idStr = request.getParameter("idcadastroPessoa");
-
-        // Se tiver ID, atualiza, senão insere
-        if (idStr != null && !idStr.isEmpty()) {
-            cadastroPessoa.setIdcadastroPessoa(Integer.parseInt(idStr));
+        try {
+            service.salvar(pessoa);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
         }
-        
-        service.salvar(cadastroPessoa);
+    }
 
-        // Redireciona para a listagem
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        request.setAttribute("cadastroPessoas", service.listar());
-        view.forward(request, response);
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            service.excluir(Integer.parseInt(idStr));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
 }

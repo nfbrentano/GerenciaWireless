@@ -1,90 +1,75 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import dao.PaisDao;
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.Pais;
+import service.PaisService;
 
-/**
- *
- * @author natan
- */
 public class PaisController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/endereco/incluirPais.jsp";
-    private static String VIEW_LISTAR = "/endereco/listarPaises.jsp";
-
-    private service.PaisService servico;
+    private final PaisService service;
+    private final Gson gson;
 
     public PaisController() {
         super();
-        servico = new service.PaisService();
+        this.service = new PaisService();
+        this.gson = new Gson();
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        if (acao == null) {
-            acao = "listar";
-        }
-
-        if (acao.equalsIgnoreCase("deletar")) {
-            String codigoPais = request.getParameter("idpais");
-            servico.excluir(Integer.parseInt(codigoPais));
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("paises", servico.listar());
-        } else if (acao.equalsIgnoreCase("editar")) {
-            encaminhar = "/endereco/editarPais.jsp";
-            String codigoPais = request.getParameter("idpais");
-            model.Pais pais = servico.getById(Integer.parseInt(codigoPais));
-            request.setAttribute("pai", pais);
-        } else if (acao.equalsIgnoreCase("listar")) {
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("paises", servico.listar());
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            Pais entidade = service.getById(Integer.parseInt(idStr));
+            sendJsonResponse(response, entidade);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        request.getRequestDispatcher(encaminhar).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        model.Pais pais = new model.Pais();
-        pais.setNome(request.getParameter("nome"));
-        String codigoPais = request.getParameter("idpais");
-
-        if (codigoPais == null || codigoPais.isEmpty()) {
-            servico.salvar(pais);
-        } else {
-            pais.setIdpais(Integer.parseInt(codigoPais));
-            servico.salvar(pais);
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        Pais entidade = gson.fromJson(jsonBody, Pais.class);
+        
+        try {
+            service.salvar(entidade);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
         }
-
-        response.sendRedirect(request.getContextPath() + VIEW_LISTAR);
     }
 
     @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a pais";
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            service.excluir(Integer.parseInt(idStr));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
-
 }

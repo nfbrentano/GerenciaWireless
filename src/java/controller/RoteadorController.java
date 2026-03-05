@@ -1,7 +1,9 @@
 package controller;
 
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,102 +11,84 @@ import javax.servlet.http.HttpServletResponse;
 import model.Roteador;
 import service.RoteadorService;
 
-/**
- * Controller para ações relacionadas a roteador
- * @author natan
- */
 public class RoteadorController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-    
-    // Atributos com informações das views
-    private static final String VIEW_INSERT_EDIT = "/conexao/incluirCadastroRoteador.jsp";
-    private static final String VIEW_LISTAR = "/conexao/listarRoteador.jsp";
-    private static final String VIEW_EDIT = "/conexao/editarCadastroRoteador.jsp";
-    
     private final RoteadorService service;
+    private final Gson gson;
 
     public RoteadorController() {
         super();
         this.service = new RoteadorService();
+        this.gson = new Gson();
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Buscar a ação requisitada
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        // Verificar qual foi a ação solicitada
-        if (acao != null && acao.equalsIgnoreCase("deletar")) {
-
-            String codigoRoteador = request.getParameter("idpontoacesso");
-            if (codigoRoteador != null) {
-                service.excluir(Integer.parseInt(codigoRoteador));
-            }
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("roteadores", service.listar());
-
-        } else if (acao != null && acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = VIEW_EDIT;
-            String codigoRoteador = request.getParameter("idpontoacesso");
-            if (codigoRoteador != null) {
-                Roteador roteador = service.getById(Integer.parseInt(codigoRoteador));
-                request.setAttribute("roteador", roteador);
-            }
-
-        } else if (acao != null && acao.equalsIgnoreCase("listar")) {
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("roteadores", service.listar());
-
+        
+        String idpontoacesso = request.getParameter("id");
+        if (idpontoacesso != null && !idpontoacesso.isEmpty()) {
+            Roteador roteador = service.getById(Integer.parseInt(idpontoacesso));
+            sendJsonResponse(response, roteador);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        // Encaminhar para a view
-        view.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar objeto roteador
-        Roteador roteador = new Roteador();
-
-        // Atribuir parâmetros recebidos
-        roteador.setSsid(request.getParameter("ssid"));
-        roteador.setModelo(request.getParameter("modelo"));
-        roteador.setLargurabanda(request.getParameter("largurabanda"));
-        roteador.setFrequencia(request.getParameter("frequencia"));
-        roteador.setIproteador(request.getParameter("iproteador"));
-        roteador.setUsuario(request.getParameter("usuario"));
-        roteador.setPass(request.getParameter("pass"));
-        
-        String codigoRoteador = request.getParameter("idpontoacesso");
-
-        // Verificar se tem código.
-        if (codigoRoteador != null && !codigoRoteador.isEmpty()) {
-            roteador.setIdpontoacesso(Integer.parseInt(codigoRoteador));
+        String acao = request.getParameter("acao");
+        if ("reiniciar".equals(acao)) {
+            String idStr = request.getParameter("id");
+            if (idStr != null) {
+                try {
+                    service.reiniciar(Integer.parseInt(idStr));
+                    sendJsonResponse(response, "{ \"status\" : \"success\", \"message\": \"Roteador reiniciando.\" }");
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+            }
+            return;
         }
-        
-        service.salvar(roteador);
 
-        // Redireciona para a listagem
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        request.setAttribute("roteadores", service.listar());
-        view.forward(request, response);
+        // Lê o body da requisição
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        Roteador roteador = gson.fromJson(jsonBody, Roteador.class);
+        
+        try {
+            service.salvar(roteador);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
+        }
     }
 
     @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a roteador";
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idpontoacesso = request.getParameter("id");
+        if (idpontoacesso != null && !idpontoacesso.isEmpty()) {
+            service.excluir(Integer.parseInt(idpontoacesso));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
 }

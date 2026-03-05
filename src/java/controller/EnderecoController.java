@@ -1,7 +1,9 @@
 package controller;
 
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,85 +11,65 @@ import javax.servlet.http.HttpServletResponse;
 import model.Endereco;
 import service.EnderecoService;
 
-/**
- * Controller para ações relacionadas a enderecos
- * @author natan
- */
 public class EnderecoController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    // Atributos com informações das views
-    private static final String VIEW_INSERT_EDIT = "/endereco/incluirEndereco.jsp";
-    private static final String VIEW_LISTAR = "/endereco/listarEnderecos.jsp";
-    private static final String VIEW_EDIT = "/endereco/editarEndereco.jsp";
-
     private final EnderecoService service;
+    private final Gson gson;
 
     public EnderecoController() {
         super();
         this.service = new EnderecoService();
+        this.gson = new Gson();
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        if (acao == null) {
-            acao = "listar";
-        }
-
-        if (acao.equalsIgnoreCase("deletar")) {
-            String codigoEndereco = request.getParameter("idendereco");
-            if (codigoEndereco != null) {
-                service.excluir(Integer.parseInt(codigoEndereco));
-            }
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("enderecos", service.listar());
-        } else if (acao.equalsIgnoreCase("editar")) {
-            encaminhar = VIEW_EDIT;
-            String codigoEndereco = request.getParameter("idendereco");
-            if (codigoEndereco != null) {
-                Endereco endereco = service.getById(Integer.parseInt(codigoEndereco));
-                request.setAttribute("end", endereco);
-            }
-        } else if (acao.equalsIgnoreCase("listar")) {
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("enderecos", service.listar());
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            Endereco entidade = service.getById(Integer.parseInt(idStr));
+            sendJsonResponse(response, entidade);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        view.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        Endereco endereco = new Endereco();
-        endereco.setRua(request.getParameter("rua"));
-        endereco.setBairro_idbairro(request.getParameter("bairro_idbairro"));
-        String codigoEndereco = request.getParameter("idendereco");
-
-        if (codigoEndereco != null && !codigoEndereco.isEmpty()) {
-            endereco.setIdendereco(Integer.parseInt(codigoEndereco));
-        }
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        Endereco entidade = gson.fromJson(jsonBody, Endereco.class);
         
-        service.salvar(endereco);
-
-        // Redireciona para a listagem (usando forward com atributo para manter padrão)
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        request.setAttribute("enderecos", service.listar());
-        view.forward(request, response);
+        try {
+            service.salvar(entidade);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
+        }
     }
 
     @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a enderecos";
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            service.excluir(Integer.parseInt(idStr));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
 }

@@ -1,7 +1,9 @@
 package controller;
 
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -9,101 +11,65 @@ import javax.servlet.http.HttpServletResponse;
 import model.Frequencia;
 import service.FrequenciaService;
 
-/**
- * Controller para ações relacionadas a frequencia
- * @author natan
- */
 public class FrequenciaController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-    
-    // Atributos com informações das views
-    // Nota: Esses caminhos /view/ podem precisar de atualização conforme a estrutura do projeto
-    private static final String VIEW_INSERT_EDIT = "/conexao/incluirFrequencia.jsp"; 
-    private static final String VIEW_LISTAR = "/conexao/listarFrequencies.jsp";
-    
     private final FrequenciaService service;
+    private final Gson gson;
 
     public FrequenciaController() {
         super();
         this.service = new FrequenciaService();
+        this.gson = new Gson();
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Buscar a ação requisitada
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        if (acao == null) {
-            acao = "listar";
-        }
-
-        // Verificar qual foi a ação solicitada
-        if (acao.equalsIgnoreCase("deletar")) {
-
-            String codigoFrequencia = request.getParameter("idfrequencia");
-            if (codigoFrequencia != null) {
-                service.excluir(Integer.parseInt(codigoFrequencia));
-            }
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("frequencias", service.listar());
-
-        } else if (acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = VIEW_INSERT_EDIT;
-            String codigoFrequencia = request.getParameter("idfrequencia");
-            if (codigoFrequencia != null) {
-                Frequencia frequencia = service.getById(Integer.parseInt(codigoFrequencia));
-                request.setAttribute("frequencia", frequencia);
-            }
-
-        } else if (acao.equalsIgnoreCase("listar")) {
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("frequencias", service.listar());
-
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            Frequencia entidade = service.getById(Integer.parseInt(idStr));
+            sendJsonResponse(response, entidade);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(encaminhar);
-        // Encaminhar para a view
-        view.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar objeto frequencia
-        Frequencia frequencia = new Frequencia();
-
-        // Atribuir parâmetros recebidos
-        frequencia.setFrequencia(request.getParameter("frequencia"));
-        String codigoFrequencia = request.getParameter("idfrequencia");
-
-        // Verificar se tem código.
-        if (codigoFrequencia != null && !codigoFrequencia.isEmpty()) {
-            frequencia.setIdfrequencia(Integer.parseInt(codigoFrequencia));
-        }
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        Frequencia entidade = gson.fromJson(jsonBody, Frequencia.class);
         
-        service.salvar(frequencia);
-
-        // Dispatcher para onde será redirecionado
-        RequestDispatcher view = request.getRequestDispatcher(VIEW_LISTAR);
-        // Adicionar atributo
-        request.setAttribute("frequencias", service.listar());
-        // Encaminhar para a view
-        view.forward(request, response);
+        try {
+            service.salvar(entidade);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
+        }
     }
 
     @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a frequencia";
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            service.excluir(Integer.parseInt(idStr));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
 }

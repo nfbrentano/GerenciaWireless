@@ -1,116 +1,75 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import dao.BairroDao;
-import service.BairroService;
+import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
+import java.io.PrintWriter;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.Bairro;
+import service.BairroService;
 
-/**
- *
- * @author natan
- */
 public class BairroController extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    // Atributos com informações das views
-    private static String VIEW_INSERT_EDIT = "/endereco/incluirBairro.jsp";
-    private static String VIEW_LISTAR = "/endereco/listarBairros.jsp";
-
-    private BairroService servico;
+    private final BairroService service;
+    private final Gson gson;
 
     public BairroController() {
         super();
+        this.service = new BairroService();
+        this.gson = new Gson();
+    }
 
-        // Instanciar um objeto do tipo BairroDao, que já possuirá a conexão ao banco
-        servico = new BairroService();
+    private void sendJsonResponse(HttpServletResponse response, Object data) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(data));
+        out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Buscar a ação requisitada
-        String acao = request.getParameter("acao");
-        String encaminhar = "";
-
-        if (acao == null) {
-            acao = "listar";
-        }
-
-        // Verificar qual foi a ação solicitada
-        if (acao.equalsIgnoreCase("deletar")) {
-
-            String codigoBairro = request.getParameter("idbairro");
-            servico.excluir(Integer.parseInt(codigoBairro));
-
-            encaminhar = VIEW_LISTAR;
-
-            request.setAttribute("bairros", servico.listar());
-
-        } else if (acao.equalsIgnoreCase("editar")) {
-
-            encaminhar = "/endereco/editarBairro.jsp";
-            String codigoBairro = request.getParameter("idbairro");
-
-            model.Bairro bairro = servico.getById(Integer.parseInt(codigoBairro));
-            request.setAttribute("bai", bairro);
-
-        } else if (acao.equalsIgnoreCase("listar")) {
-
-            encaminhar = VIEW_LISTAR;
-            request.setAttribute("bairros", servico.listar());
-
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            Bairro entidade = service.getById(Integer.parseInt(idStr));
+            sendJsonResponse(response, entidade);
         } else {
-            encaminhar = VIEW_INSERT_EDIT;
+            sendJsonResponse(response, service.listar());
         }
-
-        // Dispatcher para onde será redirecionado
-        request.getRequestDispatcher(encaminhar).forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Instanciar objeto bairro
-        model.Bairro bairro = new model.Bairro();
-
-        // Atribuir parâmetros recebidos
-        bairro.setNome(request.getParameter("nome"));
-        bairro.setCidade_idcidade(request.getParameter("cidade_idcidade"));
-        String codigoBairro = request.getParameter("idbairro");
-
-        // Verificar se tem código.
-        // Se não tiver, deve-se inserir uma nova bairro
-        if (codigoBairro == null || codigoBairro.isEmpty()) {
-
-            servico.salvar(bairro);
-
-        } else { // Se tiver código, significa que deve atualizar
-
-            bairro.setIdbairro(Integer.parseInt(codigoBairro));
-            servico.salvar(bairro);
-
+        String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        Bairro entidade = gson.fromJson(jsonBody, Bairro.class);
+        
+        try {
+            service.salvar(entidade);
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
         }
-
-        // Redirecionar para a lista de bairros
-        response.sendRedirect(request.getContextPath() + VIEW_LISTAR);
     }
 
     @Override
-    public String getServletInfo() {
-        return "Controller para ações relacionadas a bairros";
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String idStr = request.getParameter("id");
+        if (idStr != null && !idStr.isEmpty()) {
+            service.excluir(Integer.parseInt(idStr));
+            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+        } else {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");
+        }
     }
-
 }
