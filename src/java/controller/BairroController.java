@@ -26,14 +26,18 @@ public class BairroController extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
-        out.print(gson.toJson(data));
+        if (data instanceof String) {
+            out.print((String) data);
+        } else {
+            out.print(gson.toJson(data));
+        }
         out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
             Bairro entidade = service.getById(Integer.parseInt(idStr));
@@ -49,7 +53,7 @@ public class BairroController extends HttpServlet {
 
         String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         Bairro entidade = gson.fromJson(jsonBody, Bairro.class);
-        
+
         try {
             service.salvar(entidade);
             sendJsonResponse(response, "{ \"status\" : \"success\" }");
@@ -62,7 +66,7 @@ public class BairroController extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
             service.excluir(Integer.parseInt(idStr));

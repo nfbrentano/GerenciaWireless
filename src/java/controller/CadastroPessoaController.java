@@ -26,7 +26,11 @@ public class CadastroPessoaController extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
-        out.print(gson.toJson(data));
+        if (data instanceof String) {
+            out.print((String) data);
+        } else {
+            out.print(gson.toJson(data));
+        }
         out.flush();
     }
 

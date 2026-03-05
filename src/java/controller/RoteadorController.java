@@ -26,14 +26,18 @@ public class RoteadorController extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
-        out.print(gson.toJson(data));
+        if (data instanceof String) {
+            out.print((String) data);
+        } else {
+            out.print(gson.toJson(data));
+        }
         out.flush();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idpontoacesso = request.getParameter("id");
         if (idpontoacesso != null && !idpontoacesso.isEmpty()) {
             Roteador roteador = service.getById(Integer.parseInt(idpontoacesso));
@@ -68,7 +72,7 @@ public class RoteadorController extends HttpServlet {
         // Lê o body da requisição
         String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         Roteador roteador = gson.fromJson(jsonBody, Roteador.class);
-        
+
         try {
             service.salvar(roteador);
             sendJsonResponse(response, "{ \"status\" : \"success\" }");
@@ -81,7 +85,7 @@ public class RoteadorController extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idpontoacesso = request.getParameter("id");
         if (idpontoacesso != null && !idpontoacesso.isEmpty()) {
             service.excluir(Integer.parseInt(idpontoacesso));
