@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: gerencia_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: cadastroweb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - gerencia_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: gerencia_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/cadastroweb
+      - DB_USER=postgres
+      - DB_PASSWORD=postgrespassword
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gerencia_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Quando rodando local no docker, o frontend (no navegador do usuario)
+        # ainda bate no localhost, então a API base URL no build time é localhost:8080
+        - VITE_API_BASE_URL=http://localhost:8080/GerenciaWireless
+    container_name: gerencia_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - gerencia_net
+
+volumes:
+  pgdata:
+
+
+networks:
+  gerencia_net:
+    driver: bridge

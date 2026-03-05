@@ -34,10 +34,21 @@ public class Db {
     }
 
     public static Connection getConexao() throws SQLException {
-        return DriverManager.getConnection(
-                prop.getProperty("url"),
-                prop.getProperty("user"),
-                prop.getProperty("password")
-        );
+        String url = System.getenv("DB_URL");
+        if (url == null || url.trim().isEmpty()) {
+            url = prop.getProperty("url");
+        }
+
+        String user = System.getenv("DB_USER");
+        if (user == null || user.trim().isEmpty()) {
+            user = prop.getProperty("user");
+        }
+
+        String password = System.getenv("DB_PASSWORD");
+        if (password == null || password.trim().isEmpty()) {
+            password = prop.getProperty("password");
+        }
+
+        return DriverManager.getConnection(url, user, password);
     }
 }

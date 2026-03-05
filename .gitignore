@@ -1,2 +1,26 @@
-/build/
-/nbproject/private/
+# Build folders
+build_out/
+dist/
+apache-tomcat-*/
+target/
+*.war
+*.ear
+
+# Dependency folders
+node_modules/
+.npm/
+
+# IDE files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# Environment files
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db

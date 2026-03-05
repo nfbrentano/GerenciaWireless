@@ -1,0 +1,28 @@
+# Estagio de build
+FROM eclipse-temurin:11-jdk AS builder
+
+WORKDIR /app
+COPY . /app
+
+# Baixar tomcat para usar as libs (como no script local)
+RUN apt-get update && apt-get install -y curl tar && \
+    curl -s -O "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.87/bin/apache-tomcat-9.0.87.tar.gz" && \
+    tar -xzf apache-tomcat-9.0.87.tar.gz && \
+    export TOMCAT_DIR=/app/apache-tomcat-9.0.87 && \
+    mkdir -p build_out/WEB-INF/classes build_out/WEB-INF/lib && \
+    cp lib/*.jar build_out/WEB-INF/lib/ && \
+    javac -encoding UTF-8 -cp "$TOMCAT_DIR/lib/*:build_out/WEB-INF/lib/*" -d build_out/WEB-INF/classes $(find src/java -name "*.java") && \
+    find src/java -name "*.properties" -exec cp {} build_out/WEB-INF/classes/ \; && \
+    cp -r web/* build_out/
+
+# Estagio de execução
+FROM tomcat:9.0-jdk11
+
+# Apagar aplicações demo do tomcat
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Copiar a aplicação compilada
+COPY --from=builder /app/build_out /usr/local/tomcat/webapps/GerenciaWireless
+
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
