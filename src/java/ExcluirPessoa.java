@@ -37,37 +37,47 @@ public class ExcluirPessoa extends HttpServlet {
 
         try {
 
-            // Registrar o driver JDBC para PostgreSQL
-            Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-            // Conectar o banco
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-            // Statement para executar os comandos sql
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM cadastropessoa WHERE idcadastropessoa = '" + idcadastropessoa + "'");
-            System.out.println("while");
-            while (rs.next()) {
-                String user = rs.getString("nomeusuario");
-                System.out.println(user);
-                String pontoacesso = rs.getString("pontoacesso");
-                System.out.println(pontoacesso);
-                ResultSet res = st.executeQuery("SELECT * FROM pontoacesso WHERE ssid = '" + pontoacesso + "'");
-                while (res.next()) {
-                    String ip = res.getString("iproteador");
-                    System.out.println(ip);
-                    String userroteador = res.getString("usuario");
-                    String passwordroteador = res.getString("pass");
-                    ApiConnection con = ApiConnection.connect("" + ip + ""); // connect
-                    System.out.println("APi");
-                    con.login("" + userroteador + "", "" + passwordroteador + ""); // log in to router
-                    System.out.println("user e pass=" + passwordroteador);
-                    con.execute("/ip/hotspot/user/remove numbers='" + user + "'");
-                    System.out.println("execute");
-                    con.close();
-                    // SQL para excluir
-                    String query = "UPDATE cadastropessoa SET disponibilidade = false WHERE idcadastropessoa = " + idcadastropessoa;
+            // Usar o utilitário de conexão padronizado
+            Connection conn = util.Db.getConexao();
 
-                    // Executa o SQL de exclusão
-                    st.execute(query);
+            String sqlPessoa = "SELECT nomeusuario, pontoacesso FROM cadastropessoa WHERE idcadastropessoa = ?";
+            try (java.sql.PreparedStatement stPessoa = conn.prepareStatement(sqlPessoa)) {
+                stPessoa.setInt(1, Integer.parseInt(idcadastropessoa));
+                try (ResultSet rs = stPessoa.executeQuery()) {
+                    if (rs.next()) {
+                        String user = rs.getString("nomeusuario");
+                        String pontoacesso = rs.getString("pontoacesso");
+
+                        String sqlPonto = "SELECT iproteador, usuario, pass FROM pontoacesso WHERE ssid = ?";
+                        try (java.sql.PreparedStatement stPonto = conn.prepareStatement(sqlPonto)) {
+                            stPonto.setString(1, pontoacesso);
+                            try (ResultSet res = stPonto.executeQuery()) {
+                                if (res.next()) {
+                                    String ip = res.getString("iproteador");
+                                    String userroteador = res.getString("usuario");
+                                    String passwordroteador = res.getString("pass");
+                                    
+                                    ApiConnection apiCon = ApiConnection.connect(ip);
+                                    apiCon.login(userroteador, passwordroteador);
+                                    apiCon.execute("/ip/hotspot/user/remove numbers='" + user + "'");
+                                    apiCon.close();
+                                }
+                            }
+                        }
+
+                        // SQL para excluir (soft delete)
+                        String query = "UPDATE cadastropessoa SET disponibilidade = false WHERE idcadastropessoa = ?";
+                        try (java.sql.PreparedStatement stDel = conn.prepareStatement(query)) {
+                            stDel.setInt(1, Integer.parseInt(idcadastropessoa));
+                            stDel.executeUpdate();
+                        }
+
+                        // Encaminha para a listagem 
+                        request.getRequestDispatcher("/cadastroPessoa/listarCadastroPessoa.jsp").forward(request, response);
+                    }
+                }
+            }
+
 
                     // Encaminha para a listagem 
                     request.getRequestDispatcher("/cadastroPessoa/listarCadastroPessoa.jsp").forward(request, response);

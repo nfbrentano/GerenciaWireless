@@ -106,36 +106,28 @@
                      Cada linha da tabela apresentará um registro da tabela "clientes" -->
                 <%
                     try {
-
-                        // Registrar o driver JDBC para PostgreSQL
-                        Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-                        // Conectar o banco
-                        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-                        // Statement para executar os comandos sql
-                        Statement st = conn.createStatement();
+                        // Conectar o banco usando o utilitário padronizado
+                        Connection conn = util.Db.getConexao();
 
                         try {
                             String query = "SELECT idcadastropessoa, nome, sobrenome, documento, pais, estado, cidade, bairro, endereco, numeroendereco, nomeusuario, senhaacesso, pontoacesso FROM cadastropessoa WHERE disponibilidade = true ";
+                            String localizarValor = request.getParameter("localizaCadastroPessoa");
 
-                            // Se foi informado um valor no campo de pesquisa, adicionar ao SQL
-                            if (request.getParameter("localizaCadastroPessoa") != null && request.getParameter("localizaCadastroPessoa") != "") {
-                                String localizarValor = request.getParameter("localizaCadastroPessoa").toLowerCase();
-                                out.write("<p>Pesquisando por: ");
-                                out.write(localizarValor + "</p>");
-
-                                // Adicionar condição WHERE ao SQL
-                                // Observe que o SQL busca o valor parcial (%) e em minúsculo (LOWER)
-                                // Vamos pesquisar em todos os campos...
-                                query += " AND LOWER(nome) LIKE '%" + localizarValor + "%'";
-
-                                //out.write(query); // debug SQL
+                            if (localizarValor != null && !localizarValor.isEmpty()) {
+                                query += " AND LOWER(nome) LIKE ?";
                             }
 
-                            ResultSet rs = st.executeQuery(query);
+                            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
+                                if (localizarValor != null && !localizarValor.isEmpty()) {
+                                    st.setString(1, "%" + localizarValor.toLowerCase() + "%");
+                                    out.write("<p>Pesquisando por: " + localizarValor + "</p>");
+                                }
 
-                            // Processar cada item do banco e adicionar uma linha na tabela
-                            while (rs.next()) {
+                                try (ResultSet rs = st.executeQuery()) {
+                                    // Processar cada item do banco e adicionar uma linha na tabela
+                                    while (rs.next()) {
                 %>
+
                 <!-- Cria nova linha na tabela -->
                 <tr>                              
                     <!-- Colunas da linha -->
@@ -158,20 +150,17 @@
 
                 </tr>
                 <%
-                            } // Fim do while
-
-                            rs.close();
-
+                                    } // Fim do while
+                                }
+                            }
                         } catch (Exception e) {
                             out.write("Ocorreu um erro ao buscar os cadastros de usuários <span style='color: red'>" + e.getMessage() + "</span>");
-                        } finally {
                         }
-
                     } catch (Exception e) {
                         out.write("Ocorreu um erro conectando a base: <span style='color: red'>" + e.getMessage() + "</span>");
                     }
-
-                %>                
+                %>
+                
 
             </tbody>
         </table> 

@@ -6,7 +6,7 @@
 package servlet;
 
 import dao.UsuarioDAO;
-import entidades.Usuario;
+import model.Usuarios;
 import util.Erro;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
@@ -37,7 +37,7 @@ public class Index extends HttpServlet {
             }
             if (!erros.isExisteErros()) {
                 UsuarioDAO dao = new UsuarioDAO();
-                Usuario user = dao.getSingle(login);
+                Usuarios user = dao.getSingle(login);
                 if (user != null) {
                     if (user.getSenha().equalsIgnoreCase(senha)) {
                         request.getSession().setAttribute("usuarioLogado", user);

@@ -34,18 +34,18 @@ public class ExcluirEndereco extends HttpServlet {
         String idendereco = request.getParameter("cod");
 
         try {
-            // Registrar o driver JDBC para PostgreSQL
-            Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-            // Conectar o banco
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-            // Statement para executar os comandos sql
-            Statement st = conn.createStatement();
+            // Usar o utilitário de conexão padronizado
+            Connection conn = util.Db.getConexao();
 
             // SQL para excluir
-            String query = "UPDATE endereco SET disponibilidade = false WHERE idendereco = " + idendereco;
+            String query = "UPDATE endereco SET disponibilidade = false WHERE idendereco = ?";
 
             // Executa o SQL de exclusão
-            st.execute(query);
+            try (java.sql.PreparedStatement st = conn.prepareStatement(query)) {
+                st.setInt(1, Integer.parseInt(idendereco));
+                st.executeUpdate();
+            }
+
 
             // Encaminha para a listagem 
             request.getRequestDispatcher("/endereco/listarEnderecos.jsp").forward(request, response);

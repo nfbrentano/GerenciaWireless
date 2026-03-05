@@ -38,28 +38,30 @@ public class ReiniciarRoteador extends HttpServlet {
 
         try {
 
-            // Registrar o driver JDBC para PostgreSQL
-            Class.forName("org.postgresql.Driver"); // ou DriverManager.registerDriver(new org.postgresql.Driver());
-            // Conectar o banco
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/cadastroweb", "postgres", "postgres");
-            // Statement para executar os comandos sql
-            Statement st = conn.createStatement();
-         
-            System.out.println("while");
-       
-                ResultSet res = st.executeQuery("SELECT * FROM pontoacesso WHERE idpontoacesso = '" + idroteador + "'");
-                while (res.next()) {
-                    String ip = res.getString("iproteador");
-                    System.out.println(ip);
-                    String userroteador = res.getString("usuario");
-                    String passwordroteador = res.getString("pass");
-                    ApiConnection con = ApiConnection.connect("" + ip + ""); // connect
-                    System.out.println("APi");
-                    con.login("" + userroteador + "", "" + passwordroteador + ""); // log in to router
-                    System.out.println("user e pass=" + passwordroteador);
-                    con.execute("/system/reboot");
-                    System.out.println("execute");
-                    con.close();
+            // Usar o utilitário de conexão padronizado
+            Connection conn = util.Db.getConexao();
+            
+            // Usar PreparedStatement para evitar Injeção de SQL
+            String sql = "SELECT iproteador, usuario, pass FROM pontoacesso WHERE idpontoacesso = ?";
+            try (java.sql.PreparedStatement st = conn.prepareStatement(sql)) {
+                st.setInt(1, Integer.parseInt(idroteador));
+                
+                try (ResultSet res = st.executeQuery()) {
+                    if (res.next()) {
+                        String ip = res.getString("iproteador");
+                        String userroteador = res.getString("usuario");
+                        String passwordroteador = res.getString("pass");
+                        
+                        ApiConnection apiCon = ApiConnection.connect(ip);
+                        apiCon.login(userroteador, passwordroteador);
+                        apiCon.execute("/system/reboot");
+                        apiCon.close();
+                       
+                        request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
+                    }
+                }
+            }
+
                    
                     // Encaminha para a listagem 
                     request.getRequestDispatcher("/conexao/listarRoteador.jsp").forward(request, response);
