@@ -33,7 +33,7 @@ public class CadastroPessoaController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
             CadastroPessoa pessoa = service.getById(Integer.parseInt(idStr));
@@ -50,7 +50,7 @@ public class CadastroPessoaController extends HttpServlet {
         // Lê o body da requisição
         String jsonBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         CadastroPessoa pessoa = gson.fromJson(jsonBody, CadastroPessoa.class);
-        
+
         try {
             service.salvar(pessoa);
             sendJsonResponse(response, "{ \"status\" : \"success\" }");
@@ -63,11 +63,16 @@ public class CadastroPessoaController extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String idStr = request.getParameter("id");
         if (idStr != null && !idStr.isEmpty()) {
-            service.excluir(Integer.parseInt(idStr));
-            sendJsonResponse(response, "{ \"status\" : \"success\" }");
+            try {
+                service.excluir(Integer.parseInt(idStr));
+                sendJsonResponse(response, "{ \"status\" : \"success\" }");
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                sendJsonResponse(response, "{ \"error\" : \"" + e.getMessage() + "\" }");
+            }
         } else {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             sendJsonResponse(response, "{ \"error\" : \"Missing ID\" }");

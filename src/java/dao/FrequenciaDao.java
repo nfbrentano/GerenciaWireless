@@ -20,19 +20,15 @@ import util.Db;
  */
 public class FrequenciaDao {
 
-    private Connection conexao;
-
     public FrequenciaDao() {
-        // Executa o método estático para realizar a conexão
-        conexao = Db.getConexao();
     }
 
     public List<Frequencia> getAllFrequencias() {
         List<Frequencia> frequencias = new ArrayList<Frequencia>();
 
-        try {
-            Statement statement = conexao.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT * FROM frequencia ORDER BY frequencia");
+        try (Connection conexao = Db.getConexao();
+                Statement statement = conexao.createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM frequencia ORDER BY frequencia")) {
             while (rs.next()) {
                 Frequencia frequencia = new Frequencia();
                 frequencia.setIdfrequencia(rs.getInt("idfrequencia"));
@@ -48,18 +44,22 @@ public class FrequenciaDao {
     }
 
     public void insertFrequencia(Frequencia frequencia) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     public void updateFrequencia(Frequencia frequencia) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     public Frequencia getFrequenciaByCodigo(int parseInt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     public void deleteFrequencia(int parseInt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 }

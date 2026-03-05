@@ -10,6 +10,13 @@ echo "=========================================="
 echo "🔧 PREPARANDO AMBIENTE BACKEND JAVA"
 echo "=========================================="
 
+# 0. Parar Tomcat se estiver rodando
+if [ -d "$TOMCAT_DIR" ] && [ -f "$TOMCAT_DIR/bin/shutdown.sh" ]; then
+    echo "⏹️  Parando Tomcat (se estiver rodando)..."
+    bash "$TOMCAT_DIR/bin/shutdown.sh" || true
+    sleep 2
+fi
+
 # 1. Baixar Tomcat 9 (compatível com javax.servlet)
 if [ ! -d "$TOMCAT_DIR" ]; then
     echo "⬇️  Baixando Servidor Apache Tomcat $TOMCAT_VERSION..."
@@ -31,13 +38,16 @@ mkdir -p build_out/WEB-INF/lib
 echo "📚 Copiando dependências (.jar)..."
 cp lib/*.jar build_out/WEB-INF/lib/
 
-# 4. Compilar os arquivos Java
+# 4. Compilar os arquivos Java e copiar recursos
 echo "⚙️  Compilando arquivos .java..."
 # Usamos o Tomcat lib para achar o servlet-api.jar e as nossas libs
 javac -encoding UTF-8 \
       -cp "$TOMCAT_DIR/lib/*:build_out/WEB-INF/lib/*" \
       -d build_out/WEB-INF/classes \
       $(find src/java -name "*.java")
+
+echo "📂 Copiando recursos (...properties)..."
+find src/java -name "*.properties" -exec cp {} build_out/WEB-INF/classes/ \;
 
 # 5. Copiar arquivos Web (Filtros extras, web.xml)
 echo "📂 Copiando configurações WEB-INF..."
