@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, Wifi, MapPin, Menu, X, Bell, UserCircle } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
+import Roteadores from './pages/Roteadores';
+import Clientes from './pages/Clientes';
+import Enderecos from './pages/Enderecos';
 import './index.css';
 
 function Sidebar({ open, toggleSidebar }) {
@@ -26,12 +29,12 @@ function Sidebar({ open, toggleSidebar }) {
             <X size={24} />
           </button>
         </div>
-        
+
         <nav className="sidebar-nav">
           {navItems.map((item) => (
-            <Link 
-              key={item.path} 
-              to={item.path} 
+            <Link
+              key={item.path}
+              to={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
               onClick={() => {
                 if (window.innerWidth <= 768) toggleSidebar();
@@ -43,10 +46,10 @@ function Sidebar({ open, toggleSidebar }) {
           ))}
         </nav>
       </div>
-      
+
       {/* Mobile overlay */}
       {open && (
-        <div 
+        <div
           style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 40 }}
           onClick={toggleSidebar}
         />
@@ -63,7 +66,7 @@ function Header({ toggleSidebar }) {
           <Menu size={24} />
         </button>
       </div>
-      
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button className="btn-icon">
           <Bell size={20} />
@@ -82,12 +85,15 @@ function Layout() {
   return (
     <div className="app-container">
       <Sidebar open={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-      
+
       <main className="main-content">
         <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         <div className="page-container">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/roteadores" element={<Roteadores />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/enderecos" element={<Enderecos />} />
             <Route path="*" element={<Dashboard />} />
           </Routes>
         </div>
