@@ -18,71 +18,7 @@
         <filter-name>CorsFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <servlet>
-        <servlet-name>ExcluirBairro</servlet-name>
-        <servlet-class>ExcluirBairro</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirBairro</servlet-name>
-        <url-pattern>/ExcluirBairro</url-pattern>
-    </servlet-mapping>     
-    <servlet>
-        <servlet-name>ExcluirCidade</servlet-name>
-        <servlet-class>ExcluirCidade</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirCidade</servlet-name>
-        <url-pattern>/ExcluirCidade</url-pattern>
-    </servlet-mapping>  
-    <servlet>
-        <servlet-name>ExcluirEndereco</servlet-name>
-        <servlet-class>ExcluirEndereco</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirEndereco</servlet-name>
-        <url-pattern>/ExcluirEndereco</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ExcluirEstado</servlet-name>
-        <servlet-class>ExcluirEstado</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirEstado</servlet-name>
-        <url-pattern>/ExcluirEstado</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ExcluirPais</servlet-name>
-        <servlet-class>ExcluirPais</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirPais</servlet-name>
-        <url-pattern>/ExcluirPais</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ExcluirPessoa</servlet-name>
-        <servlet-class>ExcluirPessoa</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirPessoa</servlet-name>
-        <url-pattern>/ExcluirPessoa</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ExcluirRoteador</servlet-name>
-        <servlet-class>ExcluirRoteador</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExcluirRoteador</servlet-name>
-        <url-pattern>/ExcluirRoteador</url-pattern>
-    </servlet-mapping>   
-    
-     <servlet>
-        <servlet-name>ReiniciarRoteador</servlet-name>
-        <servlet-class>ReiniciarRoteador</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ReiniciarRoteador</servlet-name>
-        <url-pattern>/ReiniciarRoteador</url-pattern>
-    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>BairroController</servlet-name>
         <url-pattern>/BairroController</url-pattern>
